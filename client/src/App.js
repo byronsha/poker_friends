@@ -1,24 +1,34 @@
 import React, { Component } from "react";
-import {
-  Container,
-  Nav,
-  PinListPage,
-  AddPinPage,
-  Spinner
-} from "apollo-subscription-example-components";
-import gql from "graphql-tag";
-import { ApolloProvider, Query, Mutation } from "react-apollo";
+import { BrowserRouter as Router } from "react-router-dom";
 import { ApolloClient } from "apollo-client";
+import { ApolloProvider } from "react-apollo";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { HttpLink } from "apollo-link-http";
+import { setContext } from 'apollo-link-context'
 import { onError } from "apollo-link-error";
 import { ApolloLink } from "apollo-link";
 import { WebSocketLink } from "apollo-link-ws";
+import Nav from './components/Nav';
+import Pins from './components/Pins';
+import Login from './components/Login';
+
+const AUTH_TOKEN = 'poker_friends'
+const authLink = setContext(() => {
+  const token = localStorage.getItem(AUTH_TOKEN)
+  return {
+    headers: {
+      authorization: token ? `Bearer ${token}` : ''
+    }
+  }
+})
 
 const wsLink = new WebSocketLink({
   uri: 'ws://localhost:3001/subscriptions',
   options: {
-    reconnect: true
+    reconnect: true,
+    connectionParams: () => ({
+      authorization: localStorage.getItem(AUTH_TOKEN),
+    }),
   }
 });
 
@@ -33,111 +43,30 @@ const client = new ApolloClient({
         );
       if (networkError) console.log(`[Network error]: ${networkError}`);
     }),
-    wsLink,
+    authLink,
+    // wsLink,
     new HttpLink({
       uri: 'http://localhost:3001/graphql',
-      credentials: "same-origin"
-    })
+      credentials: "same-origin",
+    }),
   ]),
   cache: new InMemoryCache()
 });
 
-const PINS_QUERY = gql`
-  {
-    pins {
-      title
-      link
-      image
-      id
-    }
-  }
-`;
-
-const PINS_SUBSCRIPTION = gql`
-  subscription {
-    pinAdded {
-      title
-      link
-      image
-      id
-    }
-  }
-`;
-
-const PinsQuery = ({ children }) => (
-  <Query query={PINS_QUERY}>
-    {({ loading, error, data, subscribeToMore }) => {
-      if (loading)
-        return (
-          <div style={{ paddingTop: 20 }}>
-            <Spinner show />
-          </div>
-        );
-      if (error) return <p>Error :(</p>;
-      const subscribeToMorePins = () => {
-        subscribeToMore({
-          document: PINS_SUBSCRIPTION,
-          updateQuery: (prev, { subscriptionData }) => {
-            if (!subscriptionData.data || !subscriptionData.data.pinAdded)
-              return prev;
-            const newPinAdded = subscriptionData.data.pinAdded;
-
-            return Object.assign({}, prev, {
-              pins: [...prev.pins, newPinAdded]
-            });
-          }
-        });
-      };
-
-      return children(data.pins, subscribeToMorePins);
-    }}
-  </Query>
-);
-
-const AddPinMutation = ({ children }) => (
-  <Mutation
-    mutation={gql`
-      mutation AddPin($title: String!, $link: String!, $image: String!) {
-        addPin(title: $title, link: $link, image: $image)
-      }
-    `}
-  >
-    {(addPin, { data, loading, error }) =>
-      children(addPin, { data, loading, error })
-    }
-  </Mutation>
-);
-
 class App extends Component {
-  componentDidMount() {
-    this.props.subscribeToMorePins();
-  }
   render() {
     return (
-      <Container>
-        <PinListPage pins={this.props.pins} />
-        <AddPinMutation>
-          {(addPin, { data, loading, error }) => (
-            <AddPinPage
-              addPin={({ title, link, image }) =>
-                addPin({ variables: { title, link, image } })
-              }
-            />
-          )}
-        </AddPinMutation>
-        <Nav />
-      </Container>
+      <ApolloProvider client={client}>
+        <Router>
+          <div>
+            <Nav />
+            <Pins />
+            <Login />
+          </div>
+        </Router>
+      </ApolloProvider>
     );
   }
 }
 
-export default () => (
-  <ApolloProvider client={client}>
-    <PinsQuery>
-      {/* Wrap App with PinsQuery because we need to access subscribeToMorePins in componentDidMount */}
-      {(pins, subscribeToMorePins) => (
-        <App pins={pins} subscribeToMorePins={subscribeToMorePins} />
-      )}
-    </PinsQuery>
-  </ApolloProvider>
-);
+export default App;
