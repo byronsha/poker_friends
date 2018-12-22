@@ -1,26 +1,39 @@
 const { makeExecutableSchema } = require('graphql-tools')
 const { gql } = require('apollo-server-express')
 const resolvers = require('./resolvers')
+const Viewer = require('./types/Viewer')
+const Group = require('./types/Group')
 
-const typeDefs = gql`
-  type Pin {
-    title: String!, link: String!, image: String!, id: Int!
-  }
+const Root = /* GraphQL */ `
+  # The dummy queries and mutations are necessary because
+  # graphql-js cannot have empty root types and we only extend
+  # these types later on
+  # Ref: apollographql/graphql-tools#293
 
   type Query {
-    pins: [Pin]
+    dummy: String
   }
 
   type Mutation {
-    addPin(title: String!, link: String!, image: String!): Int
-    signup (username: String!, email: String!, password: String!): String
-    login (email: String!, password: String!): String
+    dummy: String
   }
-  
+
   type Subscription {
-    pinAdded: Pin
+    dummy: String
+  }
+
+  schema {
+    query: Query
+    mutation: Mutation
+    subscription: Subscription
   }
 `;
+
+const typeDefs = [
+  Root,
+  Viewer,
+  Group,
+]
 
 const schema = makeExecutableSchema({
   typeDefs,

@@ -24,7 +24,7 @@ class AddPinPage extends React.Component {
               link: this.state.link,
               image: this.state.image
             });
-            this.props.history.push("/");
+            this.props.history.push("/pins");
             event.preventDefault();
           }}
         >

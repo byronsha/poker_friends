@@ -1,15 +1,11 @@
 const database = require('../database')
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcryptjs');
 const jsonwebtoken = require('jsonwebtoken')
-const { PostgresPubSub } = require('graphql-postgres-subscriptions')
-
-const pubsub = new PostgresPubSub({
-  user: process.env.USER,
-  host: process.env.PGHOST,
-  database: process.env.PGDATABASE,
-  password: process.env.PGPASSWORD,
-  port: process.env.PGPORT,
-})
+const { merge } = require('lodash')
+const viewer = require('./queries/viewer')
+const group = require('./queries/group')
+const groupMutation = require('./mutations/group')
+const groupSubscription = require('./subscriptions/group')
 
 const resolvers = {
   Query: {
@@ -19,7 +15,7 @@ const resolvers = {
     },
   },
   Mutation: {
-    addPin: async (_, { title, link, image }) => {
+    addPin: async (_, { title, link, image }, { pubsub }) => {
       const [id] = await database("pins")
         .returning("id")
         .insert({ title, link, image });
@@ -28,7 +24,8 @@ const resolvers = {
       return id;
     },
     signup: async (_, { username, email, password }) => {
-      const passwordHash = await bcrypt.hash(password, 10);
+      const salt = bcrypt.genSaltSync(10);
+      const passwordHash = await bcrypt.hash(password, salt);
 
       const user = await database('users')
         .returning(['id', 'email'])
@@ -48,7 +45,7 @@ const resolvers = {
         throw new Error('No user with that email')
       }
 
-      const valid = await bcrypt.compare(password, user.password_hash)
+      const valid = await bcrypt.compareSync(password, user.password_hash)
       
       if (!valid) {
         throw new Error('Incorrect password')
@@ -64,9 +61,21 @@ const resolvers = {
   },
   Subscription: {
     pinAdded: {
-      subscribe: () => pubsub.asyncIterator('pinAdded'),
+      subscribe: (_, _args, { pubsub }) => pubsub.asyncIterator('pinAdded'),
     },
   },
 }
 
-module.exports = resolvers;
+const mergedResolvers = merge(
+  // temp
+  resolvers,
+  // queries
+  viewer,
+  group,
+  // mutations
+  groupMutation,
+  // subscriptions
+  groupSubscription,
+)
+
+module.exports = mergedResolvers;

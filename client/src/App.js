@@ -8,9 +8,13 @@ import { setContext } from 'apollo-link-context'
 import { onError } from "apollo-link-error";
 import { ApolloLink } from "apollo-link";
 import { WebSocketLink } from "apollo-link-ws";
+import { ThemeProvider } from 'styled-components'
+import theme from './theme'
+
 import Nav from './components/Nav';
-import Pins from './components/Pins';
 import Login from './components/Login';
+import Groups from './components/Groups';
+import Pins from './components/Pins';
 
 const AUTH_TOKEN = 'poker_friends'
 const authLink = setContext(() => {
@@ -27,7 +31,7 @@ const wsLink = new WebSocketLink({
   options: {
     reconnect: true,
     connectionParams: () => ({
-      authorization: localStorage.getItem(AUTH_TOKEN),
+      authToken: localStorage.getItem(AUTH_TOKEN),
     }),
   }
 });
@@ -44,7 +48,7 @@ const client = new ApolloClient({
       if (networkError) console.log(`[Network error]: ${networkError}`);
     }),
     authLink,
-    // wsLink,
+    wsLink,
     new HttpLink({
       uri: 'http://localhost:3001/graphql',
       credentials: "same-origin",
@@ -58,11 +62,14 @@ class App extends Component {
     return (
       <ApolloProvider client={client}>
         <Router>
-          <div>
-            <Nav />
-            <Pins />
-            <Login />
-          </div>
+          <ThemeProvider theme={theme}>
+            <div>
+              <Nav />
+              <Login />
+              <Groups />
+              <Pins />
+            </div>
+          </ThemeProvider>
         </Router>
       </ApolloProvider>
     );
