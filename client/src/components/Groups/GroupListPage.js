@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, Route } from "react-router-dom";
+import { Box, Text, Heading } from 'rebass';
 
 class GroupListPage extends React.Component {
   componentDidUpdate({ groups }) {
@@ -16,17 +17,19 @@ class GroupListPage extends React.Component {
     if (!this.props.match) {
       return null;
     }
+
     return (
-      <div>
+      <Box p={2}>
+        <Heading mb={2} color="gray">YOUR GROUPS</Heading>
         {this.props.groups.length === 0 && (
           <div>
             <div>You are not a part of any groups yet.</div>
             <Link to="/create-group">Create one</Link>
           </div>
         )}
-        <ul>
+        <div>
           {this.props.groups.map((group, index) => (
-            <li
+            <div
               key={index}
               ref={element => {
                 if (element && index === this.props.groups.length - 1) {
@@ -34,11 +37,15 @@ class GroupListPage extends React.Component {
                 }
               }}
             >
-              {group.name}
-            </li>
+              <Link to={`/groups/${group.entityId}`}>
+                <Text my={1} fontSize={1} color="gray" fontWeight="normal">
+                  {group.name}
+                </Text>
+              </Link>
+            </div>
           ))}
-        </ul>
-      </div>
+        </div>
+      </Box>
     )
   }
 }

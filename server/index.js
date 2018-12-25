@@ -75,7 +75,7 @@ ws.listen(PORT, () => {
           })
         }
 
-        throw new Error('Missing auth token!');
+        // throw new Error('Missing auth token!');
       }
     },
     {

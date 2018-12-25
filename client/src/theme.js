@@ -1,10 +1,15 @@
 export default {
   fontSizes: [
-    12, 14, 16, 20, 24, 32, 48, 64
+    14, 16, 20, 24, 32, 48, 64
   ],
   colors: {
-    blue: '#07c',
-    lightgray: '#f6f6ff'
+    gray: '#292929',
+    red: '#d33633',
+    yellow: '#d0d333',
+    green: '#33d336',
+    teal: '#33d0d3',
+    indigo: '#3633d3',
+    violet: '#d333d0',
   },
   space: [
     0, 4, 8, 16, 32, 64, 128, 256

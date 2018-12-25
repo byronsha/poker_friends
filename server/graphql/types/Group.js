@@ -1,12 +1,14 @@
 const Group = `
   type Group {
     id: Int!
+    entityId: String!
     name: String!
-    test: String
+    players: [Player!]
   }
 
   extend type Mutation {
     addGroup(name: String!): Group!
+    acceptGroupInvite(groupId: Int!): Group
   }
 
   extend type Subscription {

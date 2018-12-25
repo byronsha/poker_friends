@@ -29,8 +29,10 @@ class Groups extends React.Component {
 
 export default () => (
   <GroupsQuery>
-    {(data, subscribeToMoreGroups) => (
-      <Groups groups={data.viewer.groups} subscribeToMoreGroups={subscribeToMoreGroups} />
-    )}
+    {(data, subscribeToMoreGroups) => {
+      if (!data || !data.viewer) return null;
+      
+      return <Groups groups={data.viewer.groups} subscribeToMoreGroups={subscribeToMoreGroups} />
+    }}
   </GroupsQuery>
 )

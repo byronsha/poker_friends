@@ -9,11 +9,13 @@ import { onError } from "apollo-link-error";
 import { ApolloLink } from "apollo-link";
 import { WebSocketLink } from "apollo-link-ws";
 import { ThemeProvider } from 'styled-components'
+import { Box } from 'rebass';
 import theme from './theme'
 
 import Nav from './components/Nav';
 import Login from './components/Login';
 import Groups from './components/Groups';
+import Group from './components/Group';
 import Pins from './components/Pins';
 
 const AUTH_TOKEN = 'poker_friends'
@@ -45,7 +47,10 @@ const client = new ApolloClient({
             `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
           )
         );
-      if (networkError) console.log(`[Network error]: ${networkError}`);
+      if (networkError) {
+        console.log(`[Network error]:`);
+        console.log(networkError)
+      }
     }),
     authLink,
     wsLink,
@@ -63,12 +68,20 @@ class App extends Component {
       <ApolloProvider client={client}>
         <Router>
           <ThemeProvider theme={theme}>
-            <div>
+            <Box bg="red" style={{ height: '100vh' }}>
               <Nav />
-              <Login />
-              <Groups />
-              <Pins />
-            </div>
+              <Box p={3} style={{
+                width: 'calc(100vw - 250px)',
+                marginLeft: '250px',
+                position: 'absolute',
+                height: '100vh',
+              }}>
+                <Login />
+                <Groups />
+                <Group />
+                <Pins />
+              </Box>
+            </Box>
           </ThemeProvider>
         </Router>
       </ApolloProvider>

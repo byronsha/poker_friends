@@ -4,6 +4,7 @@ const jsonwebtoken = require('jsonwebtoken')
 const { merge } = require('lodash')
 const viewer = require('./queries/viewer')
 const group = require('./queries/group')
+const player = require('./queries/player')
 const groupMutation = require('./mutations/group')
 const groupSubscription = require('./subscriptions/group')
 
@@ -27,7 +28,7 @@ const resolvers = {
       const salt = bcrypt.genSaltSync(10);
       const passwordHash = await bcrypt.hash(password, salt);
 
-      const user = await database('users')
+      const [user] = await database('users')
         .returning(['id', 'email'])
         .insert({ username, email, password_hash: passwordHash })
 
@@ -72,6 +73,7 @@ const mergedResolvers = merge(
   // queries
   viewer,
   group,
+  player,
   // mutations
   groupMutation,
   // subscriptions

@@ -3,12 +3,24 @@ import { Link } from "react-router-dom";
 import { Query } from "react-apollo";
 import { Spinner } from "apollo-subscription-example-components";
 import gql from "graphql-tag";
-import { Box } from 'rebass';
+import { Box, Flex, Text, Button } from 'rebass';
 
-const NavLink = ({ to, children }) => (
-  <Box p={1}>
-    <Link to={to}>{children}</Link>
+const NavContainer = ({ children }) => (
+  <Box bg="gray" width="250px" p={2} style={{ position: 'absolute', height: '100vh' }}>
+    {children}
   </Box>
+)
+const NavLink = ({ to, children }) => (
+  <Link to={to}>
+    <Text my={2} color="red" fontSize={1} fontWeight="normal">
+      {children}
+    </Text>
+  </Link>
+)
+const LogoutContainer = ({ children }) => (
+  <Flex mb={2} width="calc(100% - 16px)" alignItems="center" justifyContent="space-between" style={{ position: 'absolute', bottom: 0 }}>
+    {children}
+  </Flex>
 )
 
 const NAV_QUERY = gql`{
@@ -43,7 +55,7 @@ class Nav extends React.Component {
 
   render() {
     return (
-      <nav>
+      <NavContainer>
         <NavLink to="/login">
           Login
         </NavLink>
@@ -65,12 +77,14 @@ class Nav extends React.Component {
         </NavLink>
         
         {this.props.viewer && (
-          <React.Fragment>
-            <span>logged in as {this.props.viewer.username}</span>
-            <button onClick={this.logout}>Logout</button>
-          </React.Fragment>
+          <LogoutContainer>
+            <Text color="red" fontSize={1}>
+              Logged in as {this.props.viewer.username}
+            </Text>
+            <Button ml={1} bg="red" onClick={this.logout}>Logout</Button>
+          </LogoutContainer>
         )}
-      </nav>
+      </NavContainer>
     );
   }
 }

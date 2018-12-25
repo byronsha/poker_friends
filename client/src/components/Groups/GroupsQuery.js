@@ -8,6 +8,7 @@ const GROUPS_QUERY = gql`
     viewer {
       groups {
         id
+        entityId
         name
       }
     }
@@ -18,6 +19,7 @@ const GROUPS_SUBSCRIPTION = gql`
   subscription {
     groupAdded {
       id
+      entityId
       name
     }
   }
