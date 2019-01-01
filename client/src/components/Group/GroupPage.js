@@ -1,5 +1,6 @@
 import React from "react";
-import { Box, Flex, Text, Heading, Button } from 'rebass';
+import { Box, Flex, Text, Heading } from 'rebass';
+import AddPlayerModal from './AddPlayerModal';
 
 class GroupPage extends React.Component {
   render() {
@@ -19,7 +20,7 @@ class GroupPage extends React.Component {
           </Flex>
         ))}
 
-        <Button mt={2} onClick={this.handleClick} bg="gray">Add player</Button>
+        <AddPlayerModal />
       </Box>
     )
   }

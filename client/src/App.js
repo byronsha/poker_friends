@@ -68,7 +68,7 @@ class App extends Component {
       <ApolloProvider client={client}>
         <Router>
           <ThemeProvider theme={theme}>
-            <Box bg="red" style={{ height: '100vh' }}>
+            <Box style={{ height: '100vh' }}>
               <Nav />
               <Box p={3} style={{
                 width: 'calc(100vw - 250px)',

@@ -2,7 +2,7 @@ const database = require('../../../database')
 
 module.exports = {
   Query: {
-    viewer: (_, _args, { user }) => user,    
+    viewer: (_, _args, { user }) => user,
   },
   Viewer: {
     group: async (_, { entityId }, { user }) => {
@@ -40,10 +40,13 @@ module.exports = {
       return rows;
     },
     searchUsers: async (_, { query }) => {
+      if (!query) return [];
+
       const users = await database
-        .select('entity_id', 'username', 'email')
+        .select('entity_id AS entityId', 'username', 'email')
         .from('users')
-        .where('username', 'like', `%${query}%`)
+        .where('username', 'LIKE', `%${query}%`)
+        .orWhere('email', 'LIKE', `%${query}%`)
         .limit(10)
 
       return users;
