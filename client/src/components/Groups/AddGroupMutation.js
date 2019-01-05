@@ -7,7 +7,9 @@ const AddGroupMutation = ({ children }) => (
     mutation={gql`
       mutation AddGroup($name: String!) {
         addGroup(name: $name) {
+          id
           name
+          entityId
         }
       }
     `}

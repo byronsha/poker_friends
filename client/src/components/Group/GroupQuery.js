@@ -9,6 +9,7 @@ const GROUP_QUERY = gql`
     viewer {
       group(entityId: $groupEntityId) {
         name
+        entityId
         players {
           name
           bankroll
@@ -19,12 +20,22 @@ const GROUP_QUERY = gql`
   }
 `;
 
+const GROUP_SUBSCRIPTION = gql`
+  subscription PlayerAddedSubscription($groupEntityId: String!) {
+    playerAdded(groupEntityId: $groupEntityId) {
+      name
+      bankroll
+      acceptedAt
+    }
+  }
+`;
+
 const GroupQuery = props => {
   const groupEntityId = props.match.params.groupEntityId;
   
   return (
     <Query query={GROUP_QUERY} variables={{ groupEntityId }}>
-      {({ loading, error, data }) => {
+      {({ loading, error, data, subscribeToMore }) => {
         if (loading) {
           return (
             <div style={{ paddingTop: 20 }}>
@@ -33,8 +44,32 @@ const GroupQuery = props => {
           );
         }
         if (error) return <p>Error :(</p>;
+        const subscribeToMorePlayers = () => {
+          subscribeToMore({
+            document: GROUP_SUBSCRIPTION,
+            variables: { groupEntityId },
+            updateQuery: (prev, { subscriptionData }) => {
+              if (!subscriptionData.data || !subscriptionData.data.playerAdded)
+                return prev;
+              const newPlayerAdded = subscriptionData.data.playerAdded;
 
-        return props.children(data);
+              return Object.assign({}, prev, {
+                viewer: {
+                  ...prev.viewer,
+                  group: {
+                    ...prev.viewer.group,
+                    players: [
+                      ...prev.viewer.group.players,
+                      newPlayerAdded,
+                    ],
+                  },
+                }
+              });
+            }
+          });
+        };
+
+        return props.children(data, subscribeToMorePlayers);
       }}
     </Query>
   )

@@ -5,7 +5,7 @@ const Viewer = `
     email: String!
     group(entityId: String): Group
     groups: [Group!]!
-    groupInvites: [Group!]!
+    groupInvites: [GroupInvite!]!
     searchUsers(query: String): [User!]!
   }
 

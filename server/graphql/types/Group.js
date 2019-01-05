@@ -4,17 +4,14 @@ const Group = `
     entityId: String!
     name: String!
     players: [Player!]
+    creator: User!
+    viewerJoinedAt: String!
   }
 
   extend type Mutation {
     addGroup(name: String!): Group!
     acceptGroupInvite(groupId: Int!): Group
   }
-
-  extend type Subscription {
-    groupAdded: Group
-  }
-  
 
 
   type Pin {

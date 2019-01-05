@@ -9,10 +9,11 @@ import { onError } from "apollo-link-error";
 import { ApolloLink } from "apollo-link";
 import { WebSocketLink } from "apollo-link-ws";
 import { ThemeProvider } from 'styled-components'
-import { Box } from 'rebass';
+import { Box, Card } from 'rebass';
 import theme from './theme'
 
-import Nav from './components/Nav';
+import LeftNav from './components/LeftNav';
+import TopNav from './components/TopNav';
 import Login from './components/Login';
 import Groups from './components/Groups';
 import Group from './components/Group';
@@ -68,19 +69,22 @@ class App extends Component {
       <ApolloProvider client={client}>
         <Router>
           <ThemeProvider theme={theme}>
-            <Box style={{ height: '100vh' }}>
-              <Nav />
-              <Box p={3} style={{
-                width: 'calc(100vw - 250px)',
-                marginLeft: '250px',
+            <Box bg="background" style={{ height: '100vh' }}>
+              <LeftNav />
+              <TopNav />
+
+              <Card m={4} p={3} bg="white" borderRadius={2} style={{
+                width: 'calc(100vw - 304px)',
+                marginLeft: '280px',
+                marginRight: '24px',
                 position: 'absolute',
-                height: '100vh',
+                height: 'calc(100vh - 112px)',
               }}>
                 <Login />
                 <Groups />
                 <Group />
                 <Pins />
-              </Box>
+              </Card>
             </Box>
           </ThemeProvider>
         </Router>

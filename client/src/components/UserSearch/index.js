@@ -15,9 +15,10 @@ class UserSearch extends React.Component {
 
   handleChange = e => {
     e.preventDefault();
-
     const value = e.target.value;
+    
     this.setState({ value, user: null })
+    this.props.onUserSelect(null)
 
     const setSearch = () => {
       this.setState({ searchValue: value })
@@ -31,12 +32,9 @@ class UserSearch extends React.Component {
     this.timeout = setTimeout(setSearch, 500);
   }
 
-  handleBankrollChange = e => {
-    console.log('BR', e)
-  }
-
-  handleSelectUser = user => () => {
+  handleUserSelect = user => () => {
     this.setState({ user, value: user.email })
+    this.props.onUserSelect(user)
   }
   
   render() {
@@ -55,7 +53,7 @@ class UserSearch extends React.Component {
 
         <InputNumber
           defaultValue={100}
-          onChange={this.handleBankrollChange}
+          onChange={this.props.onBankrollChange}
           formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
           parser={value => value.replace(/\$\s?|(,*)/g, '')}
           style={{ marginLeft: '24px', width: 'calc(35% - 24px)' }}
@@ -68,7 +66,7 @@ class UserSearch extends React.Component {
               return (
                 <UserSearchResults
                   users={data.viewer.searchUsers}
-                  onSelectUser={this.handleSelectUser}
+                  onSelectUser={this.handleUserSelect}
                 />
               )
             }}

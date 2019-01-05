@@ -4,7 +4,7 @@ module.exports = {
   Mutation: {
     addGroup: async (_, { name }, { user, pubsub }) => {
       const [group] = await database('groups')
-        .returning(['id', 'name'])
+        .returning(['id', 'entity_id', 'name'])
         .insert({ name, creator_id: user.id });
 
       await database('players')
@@ -15,8 +15,6 @@ module.exports = {
           accepted_at: new Date().toJSON(),
         })
         
-      pubsub.publish("groupAdded", { groupAdded: { id: group.id, name: group.name } });
-
       return group;
     },
     acceptGroupInvite: async (_, { groupId }, { user, pubsub }) => {

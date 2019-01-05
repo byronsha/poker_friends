@@ -2,7 +2,7 @@ const database = require('../../../database')
 
 module.exports = {
   Mutation: {
-    addPlayer: async (_, { groupEntityId, userEntityId, bankroll }, { user }) => {
+    addPlayer: async (_, { groupEntityId, userEntityId, bankroll }, { user, pubsub }) => {
       const [group] = await database('groups')
         .where('creator_id', user.id)
         .where('entity_id', groupEntityId);
@@ -24,10 +24,42 @@ module.exports = {
           user_id: foundUser.id,
           bankroll,
         })
-      
-      console.log('NEW P', newPlayer)
 
-      return group;
+      const addedPlayer = {
+        username: foundUser.username,
+        bankroll,
+        groupEntityId,
+      }
+
+      pubsub.publish('playerAdded', { playerAdded: addedPlayer })
+
+      return addedPlayer;
+    },
+    removePlayer: async (_, { groupEntityId, userEntityId }, { user, pubsub }) => {
+      const [group] = await database('groups')
+        .where('creator_id', user.id)
+        .where('entity_id', groupEntityId);
+  
+      if (!group) {
+        return { errors: ['Group not found'] }
+      }
+  
+      const [foundUser] = await database('users')
+        .where('entity_id', userEntityId)
+  
+      if (!foundUser) {
+        return { errors: ['User not found'] }
+      }
+  
+      const [player] = await database('players')
+        .where('group_id', group.id)
+        .where('user_id', user.id)
+        .del()
+  
+      return {
+        groupEntityId,
+        userEntityId
+      }
     }
-  }
+  },
 }

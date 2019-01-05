@@ -4,6 +4,7 @@ const resolvers = require('./resolvers')
 const Viewer = require('./types/Viewer')
 const User = require('./types/User')
 const Group = require('./types/Group')
+const GroupInvite = require('./types/GroupInvite')
 const Player = require('./types/Player')
 
 const Root = /* GraphQL */ `
@@ -36,6 +37,7 @@ const typeDefs = [
   Viewer,
   User,
   Group,
+  GroupInvite,
   Player,
 ]
 

@@ -7,7 +7,7 @@ module.exports = {
   Viewer: {
     group: async (_, { entityId }, { user }) => {
       const [group] = await database
-        .select('id', 'name')
+        .select('id', 'entity_id', 'name')
         .from('groups')
         .where('entity_id', entityId)
         .whereExists(
@@ -31,7 +31,7 @@ module.exports = {
     },
     groupInvites: async (_, _args, { user }) => {
       const rows = await database
-        .select('groups.id', 'groups.entity_id', 'groups.name')
+        .select('groups.id', 'players.created_at')
         .from('groups')
         .join('players', 'groups.id', 'players.group_id')
         .where('players.user_id', user.id)

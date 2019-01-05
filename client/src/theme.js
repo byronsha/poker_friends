@@ -10,9 +10,10 @@ export default {
     teal: '#33d0d3',
     indigo: '#3633d3',
     violet: '#d333d0',
+    background: '#f0f2f5',
   },
   space: [
-    0, 4, 8, 16, 32, 64, 128, 256
+    0, 4, 8, 16, 24, 32, 64, 128, 256
   ],
   fonts: {
     sans: 'system-ui, sans-serif',

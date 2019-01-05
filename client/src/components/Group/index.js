@@ -4,6 +4,10 @@ import GroupQuery from './GroupQuery';
 import GroupPage from './GroupPage';
 
 class Group extends React.Component {
+  componentDidMount() {
+    this.props.subscribeToMorePlayers();
+  }
+
   render() {
     if (!this.props.match) {
       return null;
@@ -23,10 +27,16 @@ export default () => (
       
       return (
         <GroupQuery>
-          {(data) => {
+          {(data, subscribeToMorePlayers) => {
             if (!data || !data.viewer) return null;
 
-            return <Group group={data.viewer.group} match={match} />
+            return (
+              <Group
+                group={data.viewer.group}
+                subscribeToMorePlayers={subscribeToMorePlayers}
+                match={match}
+              />
+            )
           }}
         </GroupQuery>
       )

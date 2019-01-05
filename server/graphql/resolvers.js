@@ -2,11 +2,16 @@ const database = require('../database')
 const bcrypt = require('bcryptjs');
 const jsonwebtoken = require('jsonwebtoken')
 const { merge } = require('lodash')
+// queries
 const viewer = require('./queries/viewer')
 const group = require('./queries/group')
+const groupInvite = require('./queries/groupInvite')
 const player = require('./queries/player')
+// mutations
 const groupMutation = require('./mutations/group')
-const groupSubscription = require('./subscriptions/group')
+const playerMutation = require('./mutations/player')
+// subscriptions
+const playerSubscription = require('./subscriptions/player')
 
 const resolvers = {
   Query: {
@@ -73,11 +78,13 @@ const mergedResolvers = merge(
   // queries
   viewer,
   group,
+  groupInvite,
   player,
   // mutations
   groupMutation,
+  playerMutation,
   // subscriptions
-  groupSubscription,
+  playerSubscription,
 )
 
 module.exports = mergedResolvers;

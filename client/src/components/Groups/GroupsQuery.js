@@ -10,24 +10,27 @@ const GROUPS_QUERY = gql`
         id
         entityId
         name
+        creator {
+          username
+        }
+        viewerJoinedAt
       }
-    }
-  }
-`;
-
-const GROUPS_SUBSCRIPTION = gql`
-  subscription {
-    groupAdded {
-      id
-      entityId
-      name
+      groupInvites {
+        group {
+          name
+          creator {
+            username
+          }
+        }
+        createdAt
+      }
     }
   }
 `;
 
 const GroupsQuery = ({ children }) => (
   <Query query={GROUPS_QUERY}>
-    {({ loading, error, data, subscribeToMore }) => {
+    {({ loading, error, data }) => {
       if (loading) {
         return (
           <div style={{ paddingTop: 20 }}>
@@ -36,25 +39,8 @@ const GroupsQuery = ({ children }) => (
         );
       }
       if (error) return <p>Error :(</p>;
-      const subscribeToMoreGroups = () => {
-        subscribeToMore({
-          document: GROUPS_SUBSCRIPTION,
-          updateQuery: (prev, { subscriptionData }) => {
-            if (!subscriptionData.data || !subscriptionData.data.groupAdded)
-              return prev;
-            const newGroupAdded = subscriptionData.data.groupAdded;
 
-            return Object.assign({}, prev, {
-              viewer: {
-                ...prev.viewer,
-                groups: [...prev.viewer.groups, newGroupAdded],
-              }
-            });
-          }
-        });
-      };
-
-      return children(data, subscribeToMoreGroups);
+      return children(data);
     }}
   </Query>
 )

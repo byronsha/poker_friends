@@ -5,14 +5,12 @@ import GroupsQuery from './GroupsQuery'
 import AddGroupMutation from './AddGroupMutation'
 
 class Groups extends React.Component {
-  componentDidMount() {
-    this.props.subscribeToMoreGroups();
-  }
-
   render() {
+    const { groups, groupInvites } = this.props;
+    
     return (
       <div>
-        <GroupListPage groups={this.props.groups} />
+        <GroupListPage groups={groups} groupInvites={groupInvites} />
         <AddGroupMutation>
           {(addGroup, { data, loading, error }) => (
             <AddGroupPage
@@ -29,10 +27,10 @@ class Groups extends React.Component {
 
 export default () => (
   <GroupsQuery>
-    {(data, subscribeToMoreGroups) => {
+    {(data) => {
       if (!data || !data.viewer) return null;
       
-      return <Groups groups={data.viewer.groups} subscribeToMoreGroups={subscribeToMoreGroups} />
+      return <Groups groups={data.viewer.groups} groupInvites={data.viewer.groupInvites} />
     }}
   </GroupsQuery>
 )
