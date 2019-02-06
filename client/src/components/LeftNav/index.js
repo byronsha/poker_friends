@@ -48,7 +48,13 @@ class LeftNav extends React.Component {
     return (
       <Menu
         mode="inline"
-        style={{ width: '256px', position: 'absolute', height: '100vh', boxShadow: '2px 0 6px rgba(0, 21, 41, .08)' }}
+        style={{
+          width: '256px',
+          position: 'absolute',
+          height: '100vh',
+          boxShadow: '2px 0 6px rgba(0, 21, 41, .08)',
+          zIndex: 2,
+        }}
       >
         <Box px={4} py={5} style={{ height: '64px' }}>
           <h2>POKER FRIENDS</h2>

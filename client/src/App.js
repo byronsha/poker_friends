@@ -9,7 +9,7 @@ import { onError } from "apollo-link-error";
 import { ApolloLink } from "apollo-link";
 import { WebSocketLink } from "apollo-link-ws";
 import { ThemeProvider } from 'styled-components'
-import { Box, Card } from 'rebass';
+import { Box } from 'rebass';
 import theme from './theme'
 
 import LeftNav from './components/LeftNav';
@@ -73,18 +73,10 @@ class App extends Component {
               <LeftNav />
               <TopNav />
 
-              <Card m={4} p={3} bg="white" borderRadius={2} style={{
-                width: 'calc(100vw - 304px)',
-                marginLeft: '280px',
-                marginRight: '24px',
-                position: 'absolute',
-                height: 'calc(100vh - 112px)',
-              }}>
-                <Login />
-                <Groups />
-                <Group />
-                <Pins />
-              </Card>
+              <Login />
+              <Groups />
+              <Group />
+              <Pins />
             </Box>
           </ThemeProvider>
         </Router>

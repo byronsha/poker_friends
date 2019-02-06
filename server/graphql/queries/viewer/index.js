@@ -43,7 +43,7 @@ module.exports = {
       if (!query) return [];
 
       const users = await database
-        .select('entity_id AS entityId', 'username', 'email')
+        .select('entity_id', 'username', 'email')
         .from('users')
         .where('username', 'LIKE', `%${query}%`)
         .orWhere('email', 'LIKE', `%${query}%`)

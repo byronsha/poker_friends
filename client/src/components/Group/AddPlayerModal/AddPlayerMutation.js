@@ -13,6 +13,7 @@ const AddPlayerMutation = ({ children }) => (
         }
       }
     `}
+    refetchQueries={['GroupQuery']}
   >
     {(addPlayer, { data, loading, error }) =>
       children(addPlayer, { data, loading, error })

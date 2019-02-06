@@ -4,6 +4,7 @@ const jsonwebtoken = require('jsonwebtoken')
 const { merge } = require('lodash')
 // queries
 const viewer = require('./queries/viewer')
+const user = require('./queries/user')
 const group = require('./queries/group')
 const groupInvite = require('./queries/groupInvite')
 const player = require('./queries/player')
@@ -77,6 +78,7 @@ const mergedResolvers = merge(
   resolvers,
   // queries
   viewer,
+  user,
   group,
   groupInvite,
   player,

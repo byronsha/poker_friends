@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Route } from "react-router-dom";
 import gql from "graphql-tag";
 import { Mutation } from "react-apollo";
+import PageContainer from '../PageContainer';
 
 const AUTH_TOKEN = 'poker_friends'
 
@@ -90,5 +91,9 @@ class Login extends Component {
 }
 
 export default () => (
-  <Route path="/login" component={props => <Login {...props} />} />
+  <Route path="/login" component={props => (
+    <PageContainer>
+      <Login {...props} />
+    </PageContainer>
+  )} />
 );

@@ -17,18 +17,64 @@ module.exports = {
         
       return group;
     },
-    acceptGroupInvite: async (_, { groupId }, { user, pubsub }) => {
+    acceptGroupInvite: async (_, { groupEntityId }, { user, pubsub }) => {
       const [player] = await database('players')
-        .where('user_id', user.id)
-        .where('group_id', groupId)
-        .where('accepted_at', null);
+        .select('players.id')
+        .join('groups', 'players.group_id', 'groups.id')
+        .where('players.user_id', user.id)
+        .where('groups.entity_id', groupEntityId)
+        .where('players.accepted_at', null);
 
       if (!player) {
         return { errors: ['Group invite not found'] }
       }
 
-      player.update({ accepted_at: new Date().toJSON() })
-      return player;
+      const now = new Date().toJSON()
+
+      await database('players')
+        .update({ accepted_at: now })
+        .where('id', player.id)
+
+      const [group] = await database('groups')
+        .where('entity_id', groupEntityId);
+
+      return group;
+    },
+    rejectGroupInvite: async (_, { groupEntityId }, { user }) => {
+      const [player] = await database('players')
+        .select('players.id')
+        .join('groups', 'players.group_id', 'groups.id')
+        .where('players.user_id', user.id)
+        .where('groups.entity_id', groupEntityId)
+        .where('players.accepted_at', null);
+
+      if (!player) {
+        return { errors: ['Invite not found'] }
+      }
+
+      await database('players')
+        .delete()
+        .where('id', player.id);
+
+      return groupEntityId
+    },
+    rescindGroupInvite: async (_, { userEntityId, groupEntityId }) => {
+      const [player] = await database('players')
+        .select('players.id')
+        .join('groups', 'players.group_id', 'groups.id')
+        .join('users', 'players.user_id', 'users.id')
+        .where('users.entity_id', userEntityId)
+        .where('groups.entity_id', groupEntityId)
+
+      if (!player) {
+        return { errors: ['Invite not found'] }
+      }
+
+      await database('players')
+        .delete()
+        .where('id', player.id)
+
+      return groupEntityId
     }
   },
 };

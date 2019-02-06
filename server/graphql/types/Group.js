@@ -10,7 +10,9 @@ const Group = `
 
   extend type Mutation {
     addGroup(name: String!): Group!
-    acceptGroupInvite(groupId: Int!): Group
+    acceptGroupInvite(groupEntityId: String!): Group
+    rejectGroupInvite(groupEntityId: String!): String
+    rescindGroupInvite(userEntityId: String!, groupEntityId: String!): String
   }
 
 

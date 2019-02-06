@@ -13,6 +13,7 @@ const AddGroupMutation = ({ children }) => (
         }
       }
     `}
+    refetchQueries={['GroupsQuery']}
   >
     {(addGroup, { data, loading, error }) =>
       children(addGroup, { data, loading, error })

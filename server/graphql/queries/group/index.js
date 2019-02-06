@@ -7,7 +7,7 @@ module.exports = {
     name: group => group.name,
     players: async group => {
       const players = await database
-        .select('users.username', 'players.bankroll', 'players.accepted_at')
+        .select('users.entity_id AS userEntityId', 'users.username', 'players.bankroll', 'players.accepted_at')
         .from('players')
         .join('users', 'players.user_id', 'users.id')
         .where('players.group_id', group.id)
@@ -31,7 +31,7 @@ module.exports = {
         .where('group_id', group.id)
         .where('user_id', user.id)
       
-        return row.accepted_at.toJSON();
+      return row.accepted_at.toJSON();
     },
   }
 }

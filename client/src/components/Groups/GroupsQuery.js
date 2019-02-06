@@ -4,7 +4,7 @@ import { Spinner } from "apollo-subscription-example-components";
 import gql from "graphql-tag";
 
 const GROUPS_QUERY = gql`
-  {
+  query GroupsQuery {
     viewer {
       groups {
         id
@@ -18,6 +18,7 @@ const GROUPS_QUERY = gql`
       groupInvites {
         group {
           name
+          entityId
           creator {
             username
           }

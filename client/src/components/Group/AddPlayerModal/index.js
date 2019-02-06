@@ -41,7 +41,7 @@ class AddPlayerModal extends React.Component {
 
   render() {
     return (
-      <Box my={2}>
+      <Box>
         <Modal
           title="Invite player"
           visible={this.state.visible}

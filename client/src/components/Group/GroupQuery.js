@@ -14,21 +14,24 @@ const GROUP_QUERY = gql`
           name
           bankroll
           acceptedAt
+          user {
+            entityId
+          }
         }
       }
     }
   }
 `;
 
-const GROUP_SUBSCRIPTION = gql`
-  subscription PlayerAddedSubscription($groupEntityId: String!) {
-    playerAdded(groupEntityId: $groupEntityId) {
-      name
-      bankroll
-      acceptedAt
-    }
-  }
-`;
+// const GROUP_SUBSCRIPTION = gql`
+//   subscription PlayerAddedSubscription($groupEntityId: String!) {
+//     playerAdded(groupEntityId: $groupEntityId) {
+//       name
+//       bankroll
+//       acceptedAt
+//     }
+//   }
+// `;
 
 const GroupQuery = props => {
   const groupEntityId = props.match.params.groupEntityId;
@@ -45,28 +48,28 @@ const GroupQuery = props => {
         }
         if (error) return <p>Error :(</p>;
         const subscribeToMorePlayers = () => {
-          subscribeToMore({
-            document: GROUP_SUBSCRIPTION,
-            variables: { groupEntityId },
-            updateQuery: (prev, { subscriptionData }) => {
-              if (!subscriptionData.data || !subscriptionData.data.playerAdded)
-                return prev;
-              const newPlayerAdded = subscriptionData.data.playerAdded;
+          // subscribeToMore({
+          //   document: GROUP_SUBSCRIPTION,
+          //   variables: { groupEntityId },
+          //   updateQuery: (prev, { subscriptionData }) => {
+          //     if (!subscriptionData.data || !subscriptionData.data.playerAdded)
+          //       return prev;
+          //     const newPlayerAdded = subscriptionData.data.playerAdded;
 
-              return Object.assign({}, prev, {
-                viewer: {
-                  ...prev.viewer,
-                  group: {
-                    ...prev.viewer.group,
-                    players: [
-                      ...prev.viewer.group.players,
-                      newPlayerAdded,
-                    ],
-                  },
-                }
-              });
-            }
-          });
+          //     return Object.assign({}, prev, {
+          //       viewer: {
+          //         ...prev.viewer,
+          //         group: {
+          //           ...prev.viewer.group,
+          //           players: [
+          //             ...prev.viewer.group.players,
+          //             newPlayerAdded,
+          //           ],
+          //         },
+          //       }
+          //     });
+          //   }
+          // });
         };
 
         return props.children(data, subscribeToMorePlayers);
