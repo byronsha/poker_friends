@@ -28,7 +28,7 @@ class InviteList extends React.Component {
 
   renderInvite = invite => (
     <List.Item>
-      <Flex width="100%" justifyContent="space-between">
+      <Flex width="100%" alignItems="center" justifyContent="space-between">
         <FlexOne>{invite.group.name}</FlexOne>
         <FlexOne>{invite.group.creator.username}</FlexOne>
         <FlexOne>{formatDate(new Date(invite.createdAt))}</FlexOne>

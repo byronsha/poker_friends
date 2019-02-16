@@ -19,6 +19,17 @@ module.exports = {
       
       return group
     },
+    table: async (_, { entityId }, { user }) => {
+      const [table] = await database
+        .select('tables.*')
+        .from('tables')
+        .join('groups', 'groups.id', 'tables.group_id')
+        .join('players', 'players.group_id', 'groups.id')
+        .where('tables.entity_id', entityId)
+        .where('players.user_id', user.id);
+
+      return table;        
+    },
     groups: async (_, _args, { user }) => {
       const rows = await database
         .select('groups.id', 'groups.entity_id', 'groups.name')

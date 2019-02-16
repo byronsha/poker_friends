@@ -2,7 +2,6 @@ const database = require('../../../database')
 
 module.exports = {
   Group: {
-    id: group => group.id,
     entityId: group => group.entity_id,
     name: group => group.name,
     players: async group => {
@@ -33,5 +32,21 @@ module.exports = {
       
       return row.accepted_at.toJSON();
     },
+    viewerIsCreator: async (group, _args, { user }) => {
+      const [row] = await database
+        .select('creator_id')
+        .from('groups')
+        .where('id', group.id)
+
+      return row.creator_id === user.id;
+    },
+    tables: async group => {
+      const tables = await database
+        .select()
+        .from('tables')
+        .where('group_id', group.id);
+      
+      return tables;
+    }
   }
 }

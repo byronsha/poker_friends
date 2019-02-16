@@ -87,7 +87,7 @@ module.exports = {
 
       await database('players')
         .where('group_id', group.id)
-        .where('user_id', user.id)
+        .where('user_id', foundUser.id)
         .update('bankroll', bankroll)
 
       return {

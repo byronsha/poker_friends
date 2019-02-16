@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Flex, Text } from 'rebass';
+import { Box, Flex, Text } from 'rebass';
 import { Button as AntButton, InputNumber } from 'antd';
 import EditBankrollMutation from './EditBankrollMutation';
 
@@ -34,6 +34,10 @@ class PlayerBankroll extends React.Component {
   }
 
   render() {
+    if (!this.props.viewerCanEdit) {
+      return <Text>${this.props.currentBankroll}</Text>
+    }
+
     return (
       <Flex justifyContent="space-between">
         {this.state.editing ? (
@@ -48,7 +52,7 @@ class PlayerBankroll extends React.Component {
           <Text>${this.props.currentBankroll}</Text>
         )}
 
-        <React.Fragment>
+        <Box style={{ paddingRight: '24px' }}>
           {this.state.editing ? (
             <Flex>
               <Button type="primary" size="small" onClick={this.handleSubmit}>
@@ -63,16 +67,17 @@ class PlayerBankroll extends React.Component {
               Edit
             </Button>
           )}
-        </React.Fragment>
+        </Box>
       </Flex>
     )
   }
 }
 
-export default ({ userEntityId, groupEntityId, currentBankroll }) => (
+export default ({ userEntityId, groupEntityId, viewerCanEdit, currentBankroll }) => (
   <EditBankrollMutation>
     {(editBankroll, { data, loading, error }) => (
       <PlayerBankroll
+        viewerCanEdit={viewerCanEdit}
         currentBankroll={currentBankroll}
         editBankroll={newBankroll =>
           editBankroll({ variables: { userEntityId, groupEntityId, bankroll: newBankroll } })

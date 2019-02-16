@@ -12,11 +12,8 @@ class Group extends React.Component {
     if (!this.props.match) {
       return null;
     }
-    return (
-      <div>
-        <GroupPage group={this.props.group} />
-      </div>
-    )
+   
+    return <GroupPage group={this.props.group} />
   }
 }
 

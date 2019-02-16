@@ -6,6 +6,8 @@ const Group = `
     players: [Player!]
     creator: User!
     viewerJoinedAt: String!
+    viewerIsCreator: Boolean!
+    tables: [Table!]
   }
 
   extend type Mutation {

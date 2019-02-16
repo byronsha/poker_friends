@@ -4,6 +4,7 @@ const Viewer = `
     username: String!
     email: String!
     group(entityId: String): Group
+    table(entityId: String): Table
     groups: [Group!]!
     groupInvites: [GroupInvite!]!
     searchUsers(query: String): [User!]!

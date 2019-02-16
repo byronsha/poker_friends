@@ -75,6 +75,6 @@ module.exports = {
         .where('id', player.id)
 
       return groupEntityId
-    }
+    },
   },
 };

@@ -8,11 +8,15 @@ const user = require('./queries/user')
 const group = require('./queries/group')
 const groupInvite = require('./queries/groupInvite')
 const player = require('./queries/player')
+const table = require('./queries/table')
+const message = require('./queries/message')
 // mutations
 const groupMutation = require('./mutations/group')
 const playerMutation = require('./mutations/player')
+const tableMutation = require('./mutations/table')
 // subscriptions
 const playerSubscription = require('./subscriptions/player')
+const tableSubscription = require('./subscriptions/table')
 
 const resolvers = {
   Query: {
@@ -82,11 +86,15 @@ const mergedResolvers = merge(
   group,
   groupInvite,
   player,
+  table,
+  message,
   // mutations
   groupMutation,
   playerMutation,
+  tableMutation,
   // subscriptions
   playerSubscription,
+  tableSubscription,
 )
 
 module.exports = mergedResolvers;

@@ -6,6 +6,8 @@ const User = require('./types/User')
 const Group = require('./types/Group')
 const GroupInvite = require('./types/GroupInvite')
 const Player = require('./types/Player')
+const Table = require('./types/Table')
+const Message = require('./types/Message')
 
 const Root = /* GraphQL */ `
   # The dummy queries and mutations are necessary because
@@ -39,6 +41,8 @@ const typeDefs = [
   Group,
   GroupInvite,
   Player,
+  Message,
+  Table,
 ]
 
 const schema = makeExecutableSchema({

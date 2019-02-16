@@ -10,6 +10,7 @@ const GROUP_QUERY = gql`
       group(entityId: $groupEntityId) {
         name
         entityId
+        viewerIsCreator
         players {
           name
           bankroll
@@ -17,6 +18,13 @@ const GROUP_QUERY = gql`
           user {
             entityId
           }
+        }
+        tables {
+          name
+          entityId
+          smallBlindAmount
+          bigBlindAmount
+          maxPlayers
         }
       }
     }

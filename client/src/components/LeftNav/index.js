@@ -75,9 +75,6 @@ class LeftNav extends React.Component {
         <Menu.Item key="5">
           <NavLink to="/groups">Groups</NavLink>
         </Menu.Item>
-        <Menu.Item key="6">
-          <NavLink to="/create-group">Create group</NavLink>
-        </Menu.Item>
 
         {this.props.viewer && (
           <Menu.Item style={{ position: 'absolute', bottom: 0 }}>

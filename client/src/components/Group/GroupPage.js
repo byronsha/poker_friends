@@ -7,6 +7,7 @@ import PageContainer from '../PageContainer';
 import AddPlayerModal from './AddPlayerModal';
 import RescindInviteButton from './RescindInviteButton';
 import PlayerBankroll from './PlayerBankroll';
+import TableList from './TableList';
 
 const breadcrumb = css`
   background: #fff;
@@ -19,7 +20,7 @@ const breadcrumb = css`
 
 class GroupPage extends React.Component {
   renderHeader = () => {
-    const headers = ['Name', 'Bankroll', 'Status', ''];
+    const headers = ['Name', 'Bankroll', 'Status'];
 
     return (
       <Flex width="100%" justifyContent="space-between">
@@ -31,6 +32,8 @@ class GroupPage extends React.Component {
   }
 
   renderPlayer = player => {
+    const { entityId: groupEntityId, viewerIsCreator } = this.props.group;
+
     return (
       <List.Item>
         <Flex width="100%" justifyContent="space-between">
@@ -38,21 +41,22 @@ class GroupPage extends React.Component {
           <Box flex={1}>
             <PlayerBankroll
               userEntityId={player.user.entityId}
-              groupEntityId={this.props.group.entityId}
+              groupEntityId={groupEntityId}
+              viewerCanEdit={viewerIsCreator}
               currentBankroll={player.bankroll}
             />
           </Box>
-          <Text flex={1}>
-            {player.acceptedAt ? `Joined: ${new Date(player.acceptedAt).toLocaleDateString()}` : 'Invite sent'}
-          </Text>
-          <Box flex={1} style={{ textAlign: 'right' }}>
+          <Flex flex={1} justifyContent="space-between">
+            <Text>
+              {player.acceptedAt ? `Joined: ${new Date(player.acceptedAt).toLocaleDateString()}` : 'Invite sent'}
+            </Text>
             {!player.acceptedAt && (
               <RescindInviteButton
                 userEntityId={player.user.entityId}
-                groupEntityId={this.props.group.entityId}
+                groupEntityId={groupEntityId}
               />
             )}
-          </Box>
+          </Flex>
         </Flex>
       </List.Item>
     )
@@ -81,7 +85,7 @@ class GroupPage extends React.Component {
         </Breadcrumb>
 
         <PageContainer>
-          <Card bordered={false} title={title}>
+          <Card bordered={false} title={title} style={{ marginBottom: '24px' }}>
             <List
               itemLayout="horizontal"
               dataSource={group.players}
@@ -89,6 +93,8 @@ class GroupPage extends React.Component {
               header={this.renderHeader()}
             />
           </Card>
+
+          <TableList groupEntityId={group.entityId} tables={group.tables} />
         </PageContainer>
       </div>
     )

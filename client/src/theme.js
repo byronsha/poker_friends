@@ -4,6 +4,7 @@ export default {
   ],
   colors: {
     gray: '#292929',
+    lightgray: '#666',
     red: '#d33633',
     yellow: '#d0d333',
     green: '#33d336',

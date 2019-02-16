@@ -18,6 +18,7 @@ import Login from './components/Login';
 import Groups from './components/Groups';
 import Group from './components/Group';
 import Pins from './components/Pins';
+import Table from './components/Table';
 
 const AUTH_TOKEN = 'poker_friends'
 const authLink = setContext(() => {
@@ -76,6 +77,7 @@ class App extends Component {
               <Login />
               <Groups />
               <Group />
+              <Table />
               <Pins />
             </Box>
           </ThemeProvider>

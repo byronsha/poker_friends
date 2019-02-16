@@ -2,9 +2,10 @@ import React from "react";
 import { css } from 'emotion';
 import { Link, Route } from "react-router-dom";
 import { Box, Text, Flex } from 'rebass';
-import { Card, List, Button, Breadcrumb } from 'antd';
+import { Card, List, Breadcrumb } from 'antd';
 import InviteList from './InviteList';
 import PageContainer from "../PageContainer";
+import AddGroupModal from "./AddGroupModal";
 
 const breadcrumb = css`
   background: #fff;
@@ -47,7 +48,7 @@ class GroupListPage extends React.Component {
       <Flex width="100%" justifyContent="space-between" alignItems="center">
         <Box flex={1}>
           <Link to={`/groups/${group.entityId}`}>
-            <Text my={1} fontWeight="normal">
+            <Text fontWeight="normal">
               {group.name}
             </Text>
           </Link>
@@ -71,7 +72,7 @@ class GroupListPage extends React.Component {
     const title = (
       <Flex justifyContent="space-between" alignItems="center">
         <Text fontSize={2}>Groups</Text>
-        <Button type="primary">Create group</Button>
+        <AddGroupModal />
       </Flex>
     )
 
