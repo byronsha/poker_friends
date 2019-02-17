@@ -44,9 +44,9 @@ big_blind_amount
 button_id
 small_blind_id
 big_blind_id
-is_complete
+is_completed
 went_to_showdown
-final_pot_size
+pots
 winners
 end_of_session: boolean
 seat_one_id...seat_nine_id
@@ -57,12 +57,13 @@ json blob?:
 
 --Action--
 id
+entity_id
 hand_id
-player_id
+user_id
 seat
 position (btn = 1, sb = 2, ...)
-next_player_id
-next_player_stack
+next_user_id
+next_user_stack
 street (deal|preflop|flop|turn|river)
 action (raise|allin|call|check|fold)
 amount
