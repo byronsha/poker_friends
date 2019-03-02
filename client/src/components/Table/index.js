@@ -6,6 +6,7 @@ import TablePage from './TablePage';
 class Table extends React.Component {
   componentDidMount() {
     this.props.subscribeToMoreMessages();
+    this.props.subscribeToTableUpdates();
   }
 
   render() {
@@ -24,13 +25,14 @@ export default () => (
 
       return (
         <TableQuery>
-          {(viewer, subscribeToMoreMessages) => {
+          {(viewer, subscribeToMoreMessages, subscribeToTableUpdates) => {
             if (!viewer) return null;
 
             return (
               <Table
                 table={viewer.table}
                 subscribeToMoreMessages={subscribeToMoreMessages}
+                subscribeToTableUpdates={subscribeToTableUpdates}
                 match={match}
               />
             )

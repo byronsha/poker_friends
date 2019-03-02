@@ -1,17 +1,19 @@
+const Deck = require('./Deck');
+
 module.exports = class PokerTables {
   constructor() {
     this.tables = {}
   }
 
-  sitPlayer(userId, tableId, seat) {
+  sitPlayer(userId, tableId, seat, stackAmount) {
     if (this.tables[tableId]) {
       if (this.tables[tableId].find(p => p.userId === userId || p.seat === seat)) {
         console.log(`WARNING: Can't sit at seat twice!`)
         return
       }
-      this.tables[tableId].push({ userId, seat });
+      this.tables[tableId].push({ userId, seat, stackAmount });
     } else {
-      this.tables[tableId] = [{ userId, seat }]
+      this.tables[tableId] = [{ userId, seat, stackAmount }]
     }
   }
 
@@ -20,6 +22,14 @@ module.exports = class PokerTables {
       const newPlayers = this.tables[tableId].filter(p => p.userId !== userId)
       this.tables[tableId] = newPlayers;
     }
+  }
+
+  players(tableId) {
+    return this.tables[tableId] || [];
+  }
+
+  newDeck() {
+    return new Deck();
   }
 }
 

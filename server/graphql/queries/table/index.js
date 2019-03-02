@@ -1,4 +1,6 @@
 const database = require('../../../database')
+const currentSeats = require('./currentSeats')
+const currentHand = require ('./currentHand')
 
 module.exports = {
   Table: {
@@ -32,6 +34,8 @@ module.exports = {
         .limit(50);
 
       return messages;
-    }
+    },
+    currentSeats,
+    currentHand,
   }
 }

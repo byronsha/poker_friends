@@ -4,6 +4,8 @@ import { Query } from 'react-apollo';
 import { Spinner } from 'apollo-subscription-example-components';
 import gql from 'graphql-tag';
 
+const seatNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
 const TABLE_QUERY = gql`
   query TableQuery($tableEntityId: String!) {
     viewer {
@@ -11,6 +13,7 @@ const TABLE_QUERY = gql`
         name
         entityId
         maxPlayers
+        bigBlindAmount
         group {
           name
           entityId
@@ -22,18 +25,52 @@ const TABLE_QUERY = gql`
             username
           }
         }
+        currentSeats {
+          number
+          stackAmount
+          isViewer
+          user {
+            username
+          }
+        }
+        currentHand {
+          stacks {
+            ${seatNumbers.map(i => `seat${i}Stack`)}
+          }
+          bets {
+            ${seatNumbers.map(i => `seat${i}Bet`)}            
+          }
+          statuses {
+            ${seatNumbers.map(i => `seat${i}Status`)}
+          }
+        }
       }
     }
   }
 `;
 
-const TABLE_SUBSCRIPTION = gql`
+const MESSAGES_SUBSCRIPTION = gql`
   subscription MessageAddedSubscription($tableEntityId: String!) {
     messageAdded(tableEntityId: $tableEntityId) {
       body
       createdAt
       author {
         username
+      }
+    }
+  }
+`;
+
+const TABLE_UPDATES_SUBSCRIPTION = gql`
+  subscription TableUpdatedSubscription($tableEntityId: String!) {
+    tableUpdated(tableEntityId: $tableEntityId) {
+      currentSeats {
+        number
+        stackAmount
+        isViewer
+        user {
+          username
+        }
       }
     }
   }
@@ -53,9 +90,10 @@ const TableQuery = props => {
           );
         }
         if (error) return <p>Error :(</p>;
+        
         const subscribeToMoreMessages = () => {
           subscribeToMore({
-            document: TABLE_SUBSCRIPTION,
+            document: MESSAGES_SUBSCRIPTION,
             variables: { tableEntityId },
             updateQuery: (prev, { subscriptionData }) => {
               if (!subscriptionData.data || !subscriptionData.data.messageAdded)
@@ -79,7 +117,30 @@ const TableQuery = props => {
           });
         }
 
-        return props.children(data.viewer, subscribeToMoreMessages);
+        const subscribeToTableUpdates = () => {
+          subscribeToMore({
+            document: TABLE_UPDATES_SUBSCRIPTION,
+            variables: { tableEntityId },
+            updateQuery: (prev, { subscriptionData }) => {
+              if (!subscriptionData.data || !subscriptionData.data.tableUpdated)
+                return prev;
+
+              const updatedTable = subscriptionData.data.tableUpdated;
+
+              return Object.assign({}, prev, {
+                viewer: {
+                  ...prev.viewer,
+                  table: {
+                    ...prev.viewer.table,
+                    currentSeats: updatedTable.currentSeats,
+                  },
+                }
+              });
+            }
+          });
+        }
+
+        return props.children(data.viewer, subscribeToMoreMessages, subscribeToTableUpdates);
       }}
     </Query>
   )

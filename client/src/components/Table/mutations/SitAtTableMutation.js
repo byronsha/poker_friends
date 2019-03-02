@@ -5,8 +5,8 @@ import gql from 'graphql-tag';
 const SitAtTableMutation = ({ children }) => (
   <Mutation
     mutation={gql`
-      mutation SitAtTable($tableEntityId: String!, $seat: Int!) {
-        sitAtTable(tableEntityId: $tableEntityId, seat: $seat)
+      mutation SitAtTable($tableEntityId: String!, $seat: Int!, $stackAmount: Int!) {
+        sitAtTable(tableEntityId: $tableEntityId, seat: $seat, stackAmount: $stackAmount)
       }
     `}
   >

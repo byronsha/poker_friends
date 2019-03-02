@@ -9,6 +9,7 @@ exports.up = (knex, Promise) => Promise.all([
       .references('id')
       .inTable('hands')
       .onDelete('CASCADE');
+    table.integer('index').unsigned();
     table
       .integer('user_id')
       .unsigned()

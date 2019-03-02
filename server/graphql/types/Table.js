@@ -8,6 +8,8 @@ const Table = `
     bigBlindAmount: Int!
     maxPlayers: Int!
     messages: [Message!]
+    currentSeats: [Seat!]
+    currentHand: Hand
   }
 
   extend type Mutation {
@@ -20,12 +22,13 @@ const Table = `
     ): Table
 
     addMessage(body: String!, tableEntityId: String!): Message
-    sitAtTable(tableEntityId: String!, seat: Int!): Boolean
+    sitAtTable(tableEntityId: String!, seat: Int!, stackAmount: Int!): Boolean
     standFromTable(tableEntityId: String!): Boolean
   }
 
   extend type Subscription {
     messageAdded(tableEntityId: String!): Message
+    tableUpdated(tableEntityId: String!): Table
   }
 `
 

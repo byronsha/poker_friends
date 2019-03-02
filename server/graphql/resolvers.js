@@ -10,6 +10,7 @@ const groupInvite = require('./queries/groupInvite')
 const player = require('./queries/player')
 const table = require('./queries/table')
 const message = require('./queries/message')
+const seat = require('./queries/seat')
 // mutations
 const groupMutation = require('./mutations/group')
 const playerMutation = require('./mutations/player')
@@ -88,6 +89,7 @@ const mergedResolvers = merge(
   player,
   table,
   message,
+  seat,
   // mutations
   groupMutation,
   playerMutation,

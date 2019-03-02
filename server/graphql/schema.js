@@ -8,6 +8,8 @@ const GroupInvite = require('./types/GroupInvite')
 const Player = require('./types/Player')
 const Table = require('./types/Table')
 const Message = require('./types/Message')
+const Seat = require('./types/Seat')
+const Hand = require('./types/Hand')
 
 const Root = /* GraphQL */ `
   # The dummy queries and mutations are necessary because
@@ -43,6 +45,8 @@ const typeDefs = [
   Player,
   Message,
   Table,
+  Seat,
+  Hand,
 ]
 
 const schema = makeExecutableSchema({
