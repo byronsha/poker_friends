@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, Route } from "react-router-dom";
+import ColorTest from 'components/ui/ColorTest';
 
 class PinListPage extends React.Component {
   componentDidUpdate({ pins }) {
@@ -17,6 +18,7 @@ class PinListPage extends React.Component {
     }
     return (
       <div>
+        <ColorTest />
         {this.props.pins.length === 0 && (
           <div
             style={{

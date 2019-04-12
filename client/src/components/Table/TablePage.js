@@ -7,6 +7,7 @@ import { Flex, Box, Text } from 'rebass';
 import { Breadcrumb } from 'antd';
 import AddMessageInput from './AddMessageInput';
 import GameTable from './GameTable';
+import ViewerActionButtons from './ViewerActionButtons';
 
 const breadcrumb = css`
   background: #fff;
@@ -21,6 +22,12 @@ const Container = styled(Box)`
   background-color: #fff;
   padding: 16px;
   border-radius: 2px;
+  height: calc(24vh + 6px);
+  flex: 1;
+
+  :first-child {
+    margin-right: 24px;
+  }
 `;
 
 const dateOptions = {
@@ -67,33 +74,39 @@ class TablePage extends React.Component {
         <PageContainer>
           <GameTable table={table} />
 
-          <Container style={{ height: 'calc(24vh + 6px)' }}>
-            <Box px={2} mb={3} style={{ maxHeight: 'calc(16vh + 16px)', overflow: 'auto', boxShadow: '#eee 1px 1px 4px inset' }}>
-              {table.messages.map((message, idx) => (
-                <Box
-                  mb={1}
-                  key={idx}
-                  ref={element => {
-                    if (element && idx === table.messages.length - 1) {
-                      this.lastElement = element;
-                    }
-                  }}
-                >
-                  <Flex alignItems="center">
-                    <Text fontSize={1} fontWeight="bold" mr={1}>
-                      {message.author.username}
-                    </Text>
-                    <Text mt={1} color="lightgray" style={{ fontSize: '12px' }}>
-                      {this.formatDate(message.createdAt)}
-                    </Text>  
-                  </Flex>
-                  <Text fontSize={1}>{message.body}</Text>
-                </Box>
-              ))}
-            </Box>
+          <Flex>
+            <Container>
+              <ViewerActionButtons currentHand={table.currentHand} />
+            </Container>
 
-            <AddMessageInput tableEntityId={table.entityId} />
-          </Container>
+            <Container>
+              <Box px={2} mb={3} style={{ maxHeight: 'calc(16vh + 16px)', overflow: 'auto', boxShadow: '#eee 1px 1px 4px inset' }}>
+                {table.messages.map((message, idx) => (
+                  <Box
+                    mb={1}
+                    key={idx}
+                    ref={element => {
+                      if (element && idx === table.messages.length - 1) {
+                        this.lastElement = element;
+                      }
+                    }}
+                  >
+                    <Flex alignItems="center">
+                      <Text fontSize={1} fontWeight="bold" mr={1}>
+                        {message.author.username}
+                      </Text>
+                      <Text mt={1} color="lightgray" style={{ fontSize: '12px' }}>
+                        {this.formatDate(message.createdAt)}
+                      </Text>  
+                    </Flex>
+                    <Text fontSize={1}>{message.body}</Text>
+                  </Box>
+                ))}
+              </Box>
+
+              <AddMessageInput tableEntityId={table.entityId} />
+            </Container>
+          </Flex>
         </PageContainer>
       </div>
     )

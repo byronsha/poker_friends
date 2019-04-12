@@ -12,6 +12,8 @@ export default {
     indigo: '#3633d3',
     violet: '#d333d0',
     background: '#f0f2f5',
+    black: '#000',
+    white: '#fff',
   },
   space: [
     0, 4, 8, 16, 24, 32, 64, 128, 256

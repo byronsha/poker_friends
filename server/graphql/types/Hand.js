@@ -35,10 +35,25 @@ const Hand = `
     seat9Status: String
   }
 
+  type ViewerActions {
+    canFold: Boolean!
+    canCheck: Boolean!
+    callAmount: Int
+    minRaiseAmount: Int
+    maxRaiseAmount: Int
+  }
+
   type Hand { 
+    entityId: String!
     stacks: Stacks!
     bets: Bets!
     statuses: Statuses!
+    viewerCards: [String!]
+    board: [String!]
+    mainPot: Int!
+    sidePots: [Int!]
+    isViewerTurn: Boolean!
+    viewerActions: ViewerActions
   }
 `
 

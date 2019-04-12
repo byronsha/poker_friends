@@ -77,7 +77,7 @@ class LeftNav extends React.Component {
         </Menu.Item>
 
         {this.props.viewer && (
-          <Menu.Item style={{ position: 'absolute', bottom: 0 }}>
+          <Menu.Item style={{ position: 'absolute', bottom: 4 }}>
             <Flex alignItems="center" justifyContent="space-between">
               <Text>
                 Logged in as {this.props.viewer.username}

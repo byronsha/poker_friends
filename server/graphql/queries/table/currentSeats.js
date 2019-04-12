@@ -8,7 +8,7 @@ module.exports = async (source, args, { user, pokerTables }) => {
     .where('is_completed', false);
 
   if (!currentHand) {
-    const players = pokerTables.players(table.id);
+    const players = pokerTables.players(source.id);
     const seatedPlayers = players.map(p => ({ ...p, isViewer: p.userId === user.id }));
     return seatedPlayers;
   }

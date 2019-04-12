@@ -12,6 +12,14 @@ const Table = `
     currentHand: Hand
   }
 
+  enum Action {
+    raise
+    allin
+    call
+    check
+    fold
+  }
+
   extend type Mutation {
     createTable(
       groupEntityId: String!
@@ -24,6 +32,7 @@ const Table = `
     addMessage(body: String!, tableEntityId: String!): Message
     sitAtTable(tableEntityId: String!, seat: Int!, stackAmount: Int!): Boolean
     standFromTable(tableEntityId: String!): Boolean
+    makeAction(handEntityId: String!, action: Action!, amount: Int): Boolean
   }
 
   extend type Subscription {

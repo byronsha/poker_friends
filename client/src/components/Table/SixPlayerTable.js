@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Flex, Box } from 'rebass';
 import Seat from './Seat';
 import EmptySeat from './EmptySeat';
+import PokerCard from 'components/ui/PokerCard';
 
 const TableContainer = styled(Flex)`
   height: 60vh;
@@ -29,6 +30,11 @@ const Table = styled(Box)`
   text-align: center;
 `
 
+const Board = styled(Flex)`
+  margin: 0 auto;
+  display: inline-flex;
+`
+
 class SixPlayerTable extends React.Component {
   findSeat = number => {
     return this.props.table.currentSeats.find(seat => seat.number === number)
@@ -39,7 +45,7 @@ class SixPlayerTable extends React.Component {
   }
 
   renderSeat = number => {
-    const { entityId, bigBlindAmount } = this.props.table;
+    const { entityId, bigBlindAmount, currentHand } = this.props.table;
     const seat = this.findSeat(number);
     const viewerIsSeated = this.viewerIsSeated();
 
@@ -48,6 +54,7 @@ class SixPlayerTable extends React.Component {
         <Seat
           seat={seat}
           number={number}
+          currentHand={currentHand}
           tableEntityId={entityId}
         />
       )
@@ -65,24 +72,44 @@ class SixPlayerTable extends React.Component {
 
   render() {
     console.log('PROPS', this.props)
+    console.log('CURRENT HAND', this.props.table.currentHand)
+
+    const { currentHand } = this.props.table;
+
+    const mainPot = currentHand && currentHand.mainPot;
+    const board = currentHand && currentHand.board;
 
     return (
       <TableContainer mb={4} justifyContent="space-between">
         <Flex justifyContent="space-between">
           {[1, 2, 3].map(i => (
-            <TopSeat key={i} p={6}>
+            <TopSeat key={i} p={5}>
               {this.renderSeat(i)}
             </TopSeat>
           ))}
         </Flex>
 
         <Table>
-          [todo]
+          {Boolean(board && board.length) && (
+            <Board>
+              {[...Array(5).keys()].map(i =>
+                board[i] ? (
+                  <PokerCard card={board[i]} key={i} />
+                ) : (
+                  <PokerCard boardMarker key={i} />
+                )
+              )}
+            </Board>
+          )}
+
+          <div>
+            Pot: ${mainPot}
+          </div>
         </Table>
 
         <Flex justifyContent="space-between">
           {[4, 5, 6].map(i => (
-            <BottomSeat key={i} p={6}>
+            <BottomSeat key={i} p={5}>
               {this.renderSeat(i)}
             </BottomSeat>
           ))}

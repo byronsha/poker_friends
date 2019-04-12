@@ -1,5 +1,9 @@
 const Deck = require('./Deck');
 
+function rotate(index, array) {
+  return array.slice(n, array.length).concat(array.slice(0, n));
+}
+
 module.exports = class PokerTables {
   constructor() {
     this.tables = {}
@@ -11,7 +15,21 @@ module.exports = class PokerTables {
         console.log(`WARNING: Can't sit at seat twice!`)
         return
       }
-      this.tables[tableId].push({ userId, seat, stackAmount });
+
+      if (this.tables[tableId].length === 1) {
+        this.tables[tableId].push({ userId, seat, stackAmount });
+      } else {
+        const currentlyFirst = this.tables[tableId][0].seat;
+
+        this.tables[tableId].push({ userId, seat, stackAmount });
+        this.tables[tableId].sort((a, b) => {
+          if (a.seat < b.seat) return -1;
+          if (a.seat > b.seat) return 1;
+        });
+
+        const rotatedToOriginalOrder = rotate(currentlyFirst - 1, this.tables[tableId])
+        this.tables[tableId] = rotatedToOriginalOrder;
+      }
     } else {
       this.tables[tableId] = [{ userId, seat, stackAmount }]
     }

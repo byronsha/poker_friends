@@ -1,6 +1,7 @@
 const database = require('../../../database')
 const sitAtTable = require('./mutations/sitAtTable');
 const standFromTable = require('./mutations/standFromTable');
+const makeAction = require('./mutations/makeAction');
 
 module.exports = {
   Mutation: {
@@ -72,5 +73,6 @@ module.exports = {
     },
     sitAtTable,
     standFromTable,
+    makeAction,
   }
 }

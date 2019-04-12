@@ -26,7 +26,6 @@ class TableList extends React.Component {
               <Text fontWeight="normal">{table.name}</Text>
             </Link>
           </Box>
-          <Text flex={1}>{table.name}</Text>
           <Text flex={1}>${table.smallBlindAmount}/{table.bigBlindAmount}</Text>
           <Text flex={1}>{table.maxPlayers}</Text>
         </Flex>
