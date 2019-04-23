@@ -14,10 +14,6 @@ function calcAmountAddedToBet({
   if (['raise', 'call'].includes(action)) {
     if (lastViewerAction && ['raise', 'call'].includes(lastViewerAction.action)) {
       return amount - lastViewerAction.amount;
-    } else if (hand.big_blind_id === user.id) {
-      return amount - hand.big_blind_amount;
-    } else if (hand.small_blind_id === user.id) {
-      return amount - hand.big_blind_amount / 2;
     }
   }
 
@@ -31,6 +27,7 @@ function checkEndOfStreet(args) {
     user,
     userIds,
     actions,
+    currentStreet,
   } = args;
 
   if (action === 'raise') {
@@ -62,31 +59,23 @@ function checkEndOfStreet(args) {
   const checkers = notFoldedUserIds.filter(filterByLastAction('check'))
   const allChecked = checkers.length === notFoldedUserIds.length;
   if (allChecked) {
-    return { isEndOfStreet: true, isEndOfHand: false };
+    return { isEndOfStreet: true, isEndOfHand: currentStreet === 'river' };
   }
 
   const raisers = notFoldedUserIds.filter(filterByLastAction('raise'));
   const allInners = notFoldedUserIds.filter(filterByLastAction('allin'));
   const callers = notFoldedUserIds.filter(filterByLastAction('call'));
 
-  if (
-    action === 'check' &&
-    checkers.length === 1 &&
-    checkers.length + callers.length === notFoldedUserIds.length
-  ) {
-    return { isEndOfStreet: true, isEndOfHand: false };    
-  }
-
   if (action === 'call' && (uniq(betAmounts).length === 1)) {
-    return { isEndOfStreet: true, isEndOfHand: false };        
+    return { isEndOfStreet: true, isEndOfHand: currentStreet === 'river' };        
   }
 
-  return { isEndOfStreet: false, isEndOfHand: false };
+  return { isEndOfStreet: false, isEndOfHand: currentStreet === 'river' };
 }
 
-module.exports = function calcPreflop(args) {
+module.exports = function calcPostflop(args) {
   const { isEndOfStreet, isEndOfHand } = checkEndOfStreet(args);
-
+  
   return {
     nextTurnMinRaise: calcNextTurnMinRaise(args),
     amountAddedToBet: calcAmountAddedToBet(args),

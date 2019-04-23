@@ -50,6 +50,7 @@ const Hand = `
     statuses: Statuses!
     viewerCards: [String!]
     board: [String!]
+    mainPotMinusBets: Int!
     mainPot: Int!
     sidePots: [Int!]
     isViewerTurn: Boolean!

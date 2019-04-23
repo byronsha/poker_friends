@@ -1,20 +1,12 @@
 const { range, uniq, groupBy } = require('lodash')
 const database = require('../../../../database')
-const { calculateCurrentHand } = require('../../../queries/table/currentHand')
-const {
-  calcNextTurnMinRaise,
-  calcAmountAddedToBet,
-  checkEndOfStreet,
-} = require('./streets/preflop');
+const calcDeal = require('./streets/deal');
+const calcPreflop = require('./streets/preflop');
+const calcPostflop = require('./streets/postflop');
+const { NEXT_STREET } = require('../../../queries/table/streets/constants')
+const endHand = require('./endHand');
 
 const seatNumbers = range(1, 10);
-
-const NEXT_STREET = {
-  'deal': 'preflop',
-  'preflop': 'flop',
-  'flop': 'turn',
-  'turn': 'river',
-};
 
 module.exports = async (_, { handEntityId, action, amount }, { user, pubsub }) => {
   const [hand] = await database('hands')
@@ -30,11 +22,6 @@ module.exports = async (_, { handEntityId, action, amount }, { user, pubsub }) =
   const lastCallOrRaise = actionRows.slice().reverse().find(row => ['raise', 'call'].includes(row.action));
 
   const actions = groupBy(actionRows, 'street');
-  const preflopActions = actions['preflop'] || [];
-  const flopActions = actions['flop'] || [];
-
-  const lastPreflopAction = preflopActions.length && preflopActions[preflopActions.length - 1];
-  const lastFlopAction = flopActions.length && flopActions[flopActions.length - 1];
 
   const userIds = seatNumbers.map(i => hand[`seat_${i}_id`]).filter(Boolean)
   const userIdToSeatHash = seatNumbers.reduce((acc, i) => {
@@ -51,53 +38,51 @@ module.exports = async (_, { handEntityId, action, amount }, { user, pubsub }) =
   const currentStreet = lastAction.end_of_street ? NEXT_STREET[lastAction.street] : lastAction.street;
 
   let isEndOfStreet = false;
-  let nextTurnMinRaise = table.big_blind_amount * 2;
-
+  let isEndOfHand = false;
+  let nextTurnMinRaise;
   let amountAddedToBet;
 
   if (lastAction.street === 'deal') {
-    isEndOfStreet = true;
-
-    if (action === 'raise' || action === 'call') {
-      if (hand.big_blind_id === user.id) {
-        amountAddedToBet -= hand.big_blind_amount;
-      } else if (hand.small_blind_id === user.id) {
-        amountAddedToBet -= hand.big_blind_amount / 2;
-      }
-    }
-
-    if (action === 'raise') {
-      const amountRaised = amount - hand.big_blind_amount;
-      nextTurnMinRaise = amount + amountRaised;
-    }
+    ({ nextTurnMinRaise, amountAddedToBet } = calcDeal({
+      action,
+      amount,
+      user,
+      hand,
+    }));
   } else if (currentStreet === 'preflop') {
-    nextTurnMinRaise = calcNextTurnMinRaise({
+    const preflopActions = actions['preflop'] || [];
+    const lastPreflopAction = preflopActions.length && preflopActions[preflopActions.length - 1];
+    const lastPreflopCallOrRaise = preflopActions.length && preflopActions.slice().reverse().find(row => ['raise', 'call'].includes(row.action));
+
+    ({ nextTurnMinRaise, amountAddedToBet, isEndOfStreet, isEndOfHand } = calcPreflop({
       action,
       amount,
-      lastCallOrRaise,
-      lastAction,
-    });
-    amountAddedToBet = calcAmountAddedToBet({
-      amount,
-      action,
       user,
       userIds,
       hand,
-      preflopActions,
-    });
-    isEndOfStreet = checkEndOfStreet({
-      amount,
+      actions: preflopActions,
+      lastAction: lastPreflopAction,
+      lastCallOrRaise: lastPreflopCallOrRaise,
+    }));
+  } else {
+    const streetActions = actions[currentStreet] || [];
+    const lastStreetAction = streetActions.length && streetActions[streetActions.length - 1];
+    const lastStreetCallOrRaise = streetActions.length && streetActions.slice().reverse().find(row => ['raise', 'call'].includes(row.action));
+
+    ({ nextTurnMinRaise, amountAddedToBet, isEndOfStreet, isEndOfHand } = calcPostflop({
       action,
+      amount,
       user,
       userIds,
-      preflopActions,
-    });
-  } else if (currentStreet === 'flop') {
-
+      hand,
+      currentStreet,
+      actions: streetActions,
+      lastAction: lastStreetAction,
+      lastCallOrRaise: lastStreetCallOrRaise,
+    }));
   }
 
   // todo: handle allin case
-  // todo: calculate next turn min raise
 
   const stacks = seatNumbers.reduce((acc, i) => {
     if (userIdToSeatHash[user.id] === i) {
@@ -134,4 +119,8 @@ module.exports = async (_, { handEntityId, action, amount }, { user, pubsub }) =
       tableEntityId: table.entity_id,
     },
   });
+  
+  if (isEndOfHand) {
+    setTimeout(() => endHand(hand.id, pubsub), 2500);
+  }
 }

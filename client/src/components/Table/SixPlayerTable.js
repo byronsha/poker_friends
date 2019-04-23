@@ -76,6 +76,7 @@ class SixPlayerTable extends React.Component {
 
     const { currentHand } = this.props.table;
 
+    const mainPotMinusBets = currentHand && currentHand.mainPotMinusBets;
     const mainPot = currentHand && currentHand.mainPot;
     const board = currentHand && currentHand.board;
 
@@ -90,6 +91,10 @@ class SixPlayerTable extends React.Component {
         </Flex>
 
         <Table>
+          {mainPotMinusBets > 0 && (
+            <div>Main pot: ${mainPotMinusBets}</div>
+          )}
+  
           {Boolean(board && board.length) && (
             <Board>
               {[...Array(5).keys()].map(i =>
@@ -102,9 +107,9 @@ class SixPlayerTable extends React.Component {
             </Board>
           )}
 
-          <div>
-            Pot: ${mainPot}
-          </div>
+          {mainPot > 0 && (
+            <div>Total pot: ${mainPot}</div>
+          )}
         </Table>
 
         <Flex justifyContent="space-between">

@@ -1,8 +1,10 @@
 const seatNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-const flopBets = (lastPreflopAction, lastFlopAction) => {
+const postflopBets = (lastPreflopAction, lastFlopAction) => {
   return seatNumbers.reduce((acc, i) => {
-    if (lastPreflopAction[`seat_${i}_stack`]) {
+    if (!lastFlopAction) {
+      acc[`seat${i}Bet`] = null;
+    } else if (lastPreflopAction[`seat_${i}_stack`]) {
       const stackAtFlopStart = lastPreflopAction[`seat_${i}_stack`];
       acc[`seat${i}Bet`] = stackAtFlopStart - (lastFlopAction ? lastFlopAction[`seat_${i}_stack`] : 0);
     }
@@ -10,11 +12,10 @@ const flopBets = (lastPreflopAction, lastFlopAction) => {
   }, {});
 }
 
-const flopStatuses = (userIds, currentHand, preflopActions, flopActions) => {
+const postflopStatuses = (userIds, currentHand, allActions) => {
   const userIdToActionsHash = userIds.reduce((acc, userId) => {
     acc[userId] = [
-      ...preflopActions.filter(a => a.user_id === userId).map(a => a.action),
-      ...flopActions.filter(a => a.user_id === userId).map(a => a.action),
+      ...allActions.filter(a => a.user_id === userId).map(a => a.action),
     ];
     return acc;
   }, {})
@@ -31,17 +32,21 @@ const flopStatuses = (userIds, currentHand, preflopActions, flopActions) => {
   }, {});
 }
 
-const flopViewerActions = (user, currentHand, flopActions, isViewerTurn, stacks) => {
+const postflopViewerActions = (user, currentHand, streetActions, isViewerTurn, stacks) => {
   let viewerActions = null;
+
+  const lastAction = streetActions[streetActions.length - 1];
+  if (lastAction.street === 'river' && lastAction.end_of_street) {
+    return null;
+  }
 
   seatNumbers.forEach(i => {
     if (currentHand[`seat_${i}_id`] === user.id && isViewerTurn) {
-      const raises = flopActions.filter(a => a.action === 'raise');
+      const raises = streetActions.filter(a => a.action === 'raise');
 
       let minRaiseAmount = currentHand.big_blind_amount;
       if (raises.length === 1) {
-        const difference = raises[0].amount - currentHand.big_blind_amount;
-        minRaiseAmount = raises[0].amount + difference;
+        minRaiseAmount = raises[0].amount * 2;
       } else if (raises.length > 1) {
         const difference = raises[raises.length - 1].amount - raises[raises.length - 2].amount
         minRaiseAmount = raises[raises.length - 1].amount + difference;
@@ -67,7 +72,7 @@ const flopViewerActions = (user, currentHand, flopActions, isViewerTurn, stacks)
 }
 
 module.exports = {
-  flopBets,
-  flopStatuses,
-  flopViewerActions,
+  postflopBets,
+  postflopStatuses,
+  postflopViewerActions,
 };

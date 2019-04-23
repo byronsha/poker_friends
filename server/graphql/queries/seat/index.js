@@ -11,5 +11,7 @@ module.exports = {
       return user;
     },
     isViewer: (source, _, { user }) => source.userId === user.id,
+    isTurn: source => source.isTurn,
+    isButton: source => source.isButton,
   }
-}
+} 

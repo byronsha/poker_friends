@@ -11,6 +11,8 @@ const seatsAndHandsFragment = `
     number
     stackAmount
     isViewer
+    isTurn
+    isButton
     user {
       username
     }
@@ -27,6 +29,7 @@ const seatsAndHandsFragment = `
     }
     entityId
     board
+    mainPotMinusBets
     mainPot
     viewerCards
     isViewerTurn

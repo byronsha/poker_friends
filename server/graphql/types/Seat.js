@@ -4,6 +4,8 @@ const Seat = `
     user: User!
     stackAmount: Int
     isViewer: Boolean
+    isTurn: Boolean
+    isButton: Boolean
   }
 `
 

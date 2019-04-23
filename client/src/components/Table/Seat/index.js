@@ -1,8 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Box, Text, Flex } from 'rebass';
+import { css } from 'emotion';
+import { Box, Flex } from 'rebass';
 import { Menu, Dropdown, Icon, Modal } from 'antd';
 import PokerCard from 'components/ui/PokerCard';
+import Nameplate from './Nameplate';
 
 import StandFromTableMutation from '../mutations/StandFromTableMutation';
 
@@ -10,6 +12,12 @@ const Chips = styled(Box)`
   height: 4px;
   width: 16px;
   border-radius: 2px;
+`;
+
+const Bet = styled(Box)`
+  position: absolute;
+  left: 120px;
+  bottom: -24px;
 `;
 
 class Seat extends React.Component {
@@ -54,15 +62,15 @@ class Seat extends React.Component {
     if (!bet) return null;
 
     return (
-      <Box ml={7}>
+      <Bet>
         ${bet}
         <Chips bg="lightgray" />
-      </Box>
+      </Bet>
     )
   }
 
   render() {
-    const { number, stackAmount, user, isViewer } = this.props.seat;
+    const { number, stackAmount, user, isViewer, isTurn, isButton } = this.props.seat;
 
     const menu = (
       <Menu>
@@ -73,11 +81,16 @@ class Seat extends React.Component {
     );
 
     return (
-      <Box>
+      <Box className={css`position: relative;`}>
         {this.renderHand()}
 
-        <Text>{number} {user.username}</Text>
-        <Text>$ {stackAmount}</Text>
+        <Nameplate
+          number={number}
+          user={user}
+          stackAmount={stackAmount}
+          isTurn={isTurn}
+          isButton={isButton}
+        />
 
         {isViewer && (
           <Dropdown overlay={menu} trigger={['click']}>
