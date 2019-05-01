@@ -41,22 +41,22 @@ function checkEndOfStreet(args) {
 
   const notFoldedUserIds = Object.keys(userIdToActionsHash).filter(userId => {
     const actions = userIdToActionsHash[userId];
-    return actions.length > 0 && actions[actions.length - 1].action !== 'fold';
+    return actions.length === 0 || (actions.length > 0 && actions[actions.length - 1].action !== 'fold');
   });
 
   const betAmounts = notFoldedUserIds.map(userId => {
     const actions = userIdToActionsHash[userId];
-    return actions[actions.length - 1].amount;
+    return actions.length > 0 ? actions[actions.length - 1].amount : 0;
   })
 
-  if (notFoldedUserIds < 2) {
+  if (notFoldedUserIds.length < 2) {
     console.log('HAND OVER - ALL FOLDED BUT 1')
     return { isEndOfStreet: true, isEndOfHand: true }
   }
 
   const filterByLastAction = action => userId => {
     const actions = userIdToActionsHash[userId];
-    return actions[actions.length - 1].action === action;
+    return actions.length > 0 && actions[actions.length - 1].action === action;
   }
 
   const checkers = notFoldedUserIds.filter(filterByLastAction('check'))
@@ -84,12 +84,20 @@ function checkEndOfStreet(args) {
   return { isEndOfStreet: false, isEndOfHand: false };
 }
 
-module.exports = function calcPreflop(args) {
+module.exports = function calcPreflop(args, isDeal = false) {
   const { isEndOfStreet, isEndOfHand } = checkEndOfStreet(args);
 
+  let nextTurnMinRaise;
+  let amountAddedToBet;
+
+  if (!isDeal) {
+    nextTurnMinRaise = calcNextTurnMinRaise(args);
+    amountAddedToBet = calcAmountAddedToBet(args);
+  }
+
   return {
-    nextTurnMinRaise: calcNextTurnMinRaise(args),
-    amountAddedToBet: calcAmountAddedToBet(args),
+    nextTurnMinRaise,
+    amountAddedToBet,
     isEndOfStreet,
     isEndOfHand,
   }

@@ -42,24 +42,29 @@ module.exports = async (_, { handEntityId, action, amount }, { user, pubsub }) =
   let nextTurnMinRaise;
   let amountAddedToBet;
 
+  const args = {
+    action,
+    amount,
+    user,
+    userIds,
+    hand, 
+  }
+
   if (lastAction.street === 'deal') {
-    ({ nextTurnMinRaise, amountAddedToBet } = calcDeal({
-      action,
-      amount,
-      user,
-      hand,
-    }));
+    ({ nextTurnMinRaise, amountAddedToBet } = calcDeal(args));
+    ({ isEndOfStreet, isEndOfHand } = calcPreflop({
+      ...args,
+      actions: [],
+      lastAction: null,
+      lastCallOrRaise: null,
+    }, true));
   } else if (currentStreet === 'preflop') {
     const preflopActions = actions['preflop'] || [];
     const lastPreflopAction = preflopActions.length && preflopActions[preflopActions.length - 1];
     const lastPreflopCallOrRaise = preflopActions.length && preflopActions.slice().reverse().find(row => ['raise', 'call'].includes(row.action));
 
     ({ nextTurnMinRaise, amountAddedToBet, isEndOfStreet, isEndOfHand } = calcPreflop({
-      action,
-      amount,
-      user,
-      userIds,
-      hand,
+      ...args,
       actions: preflopActions,
       lastAction: lastPreflopAction,
       lastCallOrRaise: lastPreflopCallOrRaise,
@@ -70,11 +75,7 @@ module.exports = async (_, { handEntityId, action, amount }, { user, pubsub }) =
     const lastStreetCallOrRaise = streetActions.length && streetActions.slice().reverse().find(row => ['raise', 'call'].includes(row.action));
 
     ({ nextTurnMinRaise, amountAddedToBet, isEndOfStreet, isEndOfHand } = calcPostflop({
-      action,
-      amount,
-      user,
-      userIds,
-      hand,
+      ...args,
       currentStreet,
       actions: streetActions,
       allActions: actionRows.filter(r => r.street !== 'deal'),

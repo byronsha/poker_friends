@@ -14,15 +14,16 @@ function camelizeKeys(object) {
   return newObject;
 }
 
+// players[0] will always be the button after rotating
 function orderPlayersByTurn(players, lastHand) {
   let orderedPlayers = players.slice().sort((a, b) => a.seat - b.seat);
 
   if (lastHand && !lastHand.end_of_session) {
     const orderedSeats = players.map(p => p.seat).sort();
-    const lastButtonSeat = seatNumbers.find(i => lastHand[`seat_${i}_id`] === lastHand.button_id);
-
+    const lastButtonSeat = seatNumbers.find(i =>
+      lastHand[`seat_${i}_id`] === lastHand.button_id
+    );
     const rotateIdx = orderedSeats.indexOf(lastButtonSeat) + 1;
-    // players[0] will always be the button after rotating
     return [...orderedPlayers.slice(rotateIdx), ...orderedPlayers.slice(0, rotateIdx)]
   }
 
@@ -35,7 +36,7 @@ module.exports = async function initHand(table, players, pubsub, user) {
     .orderBy('created_at', 'DESC')
     .limit(1);
 
-  const orderedPlayers = orderPlayersByTurn();
+  const orderedPlayers = orderPlayersByTurn(players, lastHand);
 
   const playerHash = keyBy(players, 'seat');
   const isHeadsUp = players.length === 2;

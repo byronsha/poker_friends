@@ -6,13 +6,13 @@ const initHand = require('./initHand')
 
 const seatNumbers = range(1, 10);
 
-function determineWinner(hand) {
+function determineWinner(hand, notFoldedUserIds) {
   const handToUserIdHash = {};
 
   const hands = seatNumbers.map(i => {
     const userId = hand[`seat_${i}_id`];
 
-    if (userId) {
+    if (userId && notFoldedUserIds.includes(userId)) {
       const playerCards = hand[`seat_${i}_info`].hand;
       const playerAndBoardCards = [...hand.board, ...playerCards].sort(sortCards);
 
@@ -28,20 +28,33 @@ function determineWinner(hand) {
     .map(card => `${card.value}${card.suit}`)
     .sort(sortCards).join(',');
 
-  return handToUserIdHash[winningCards];
-  
-  // var hand = Hand.solve(['Ad', 'As', 'Jc', 'Th', '2d', 'Qs', 'Qd']);
-  // console.log(hand.name); // Two Pair
-  // console.log(hand.descr); // Two Pair, A's & Q's
+  const winnerId = handToUserIdHash[winningCards]
+  return { winnerId, winningHandText: winner[0].descr };
 }
 
 module.exports = async (hand, table, pubsub, user) => {
-  const [lastAction] = await database('actions')
+  const actions = await database('actions')
     .where('hand_id', hand.id)
-    .orderBy('index', 'DESC')
-    .limit(1);
+    .orderBy('index', 'DESC');
 
-  const winnerId = determineWinner(hand)
+  const lastAction = actions[0];
+
+  const userIds = seatNumbers.map(i => hand[`seat_${i}_id`]).filter(Boolean);
+  const notFoldedUserIds = userIds.filter(userId =>
+    !actions.find(a => a.action === 'fold' && a.user_id === userId)
+  )
+  
+  let winnerId;
+  let winningHandText = '';
+
+  if (notFoldedUserIds.length === 1) {
+    winnerId = notFoldedUserIds[0]
+  } else {
+    ({ winnerId, winningHandText } = determineWinner(hand, notFoldedUserIds));
+  }
+
+  const [winner] = await database('users')
+    .where('id', winnerId);
 
   const seatInfo = seatNumbers.reduce((acc, i) => {
     const userId = hand[`seat_${i}_id`];
@@ -64,6 +77,25 @@ module.exports = async (hand, table, pubsub, user) => {
     .update('winners', winnerId)
     .update('is_completed', true)
     .update(seatInfo)
+
+  const [newMessage] = await database('messages')
+    .returning(['id'])
+    .insert({
+      body: `${winner.username} wins $${lastAction.main_pot}${winningHandText ? ` -- ${winningHandText}` : ''}`,
+      table_id: table.id,
+      user_id: null,
+    })
+
+  const [message] = await database('messages')
+    .select()
+    .where('id', newMessage.id)
+
+  pubsub.publish('messageAdded', {
+    messageAdded: {
+      ...message,
+      tableEntityId: table.entity_id,
+    }
+  });
 
   pubsub.publish('tableUpdated', {
     tableUpdated: {

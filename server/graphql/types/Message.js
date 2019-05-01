@@ -3,7 +3,7 @@ const Message = `
     entityId: String!
     body: String!
     table: Table!
-    author: User!
+    author: User
     createdAt: String!
   }
 `;
