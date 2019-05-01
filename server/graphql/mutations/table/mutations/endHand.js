@@ -1,36 +1,10 @@
 const database = require('../../../../database')
 const { range } = require('lodash');
 const Hand = require('pokersolver').Hand;
+const sortCards = require('./sortCards');
+const initHand = require('./initHand')
 
 const seatNumbers = range(1, 10);
-
-const SUITS = ['s', 'd', 'h', 'c'];
-const RANKS = ['A', 'K', 'Q', 'J', 'T'];
-
-function sortSuits(a, b) {
-  return SUITS.indexOf(a) - SUITS.indexOf(b);
-}
-
-function sortRanks(a, b) {
-  if (RANKS.includes(a) && !RANKS.includes(b)) return -1;
-  if (RANKS.includes(b) && !RANKS.includes(a)) return 1;
-  return RANKS.indexOf(a) - RANKS.indexOf(b);
-}
-
-function sortCards(a, b) {
-  let [rankA, suitA] = a.split('')
-  let [rankB, suitB] = b.split('')
-
-  if (rankA === rankB) {
-    return sortSuits(suitA, suitB)
-  }
-
-  if (RANKS.includes(rankA) || RANKS.includes(rankB)) {
-    return sortRanks(rankA, rankB)
-  }
-  
-  return parseInt(rankB) - parseInt(rankA);
-}
 
 function determineWinner(hand) {
   const handToUserIdHash = {};
@@ -54,36 +28,42 @@ function determineWinner(hand) {
     .map(card => `${card.value}${card.suit}`)
     .sort(sortCards).join(',');
 
-  console.log({ winner });
-
   return handToUserIdHash[winningCards];
   
-
   // var hand = Hand.solve(['Ad', 'As', 'Jc', 'Th', '2d', 'Qs', 'Qd']);
   // console.log(hand.name); // Two Pair
   // console.log(hand.descr); // Two Pair, A's & Q's
 }
 
-module.exports = async (handId, pubsub) => {
-  const [hand] = await database('hands')
-    .where('id', handId)
-
+module.exports = async (hand, table, pubsub, user) => {
   const [lastAction] = await database('actions')
-    .where('hand_id', handId)
+    .where('hand_id', hand.id)
     .orderBy('index', 'DESC')
     .limit(1);
 
   const winnerId = determineWinner(hand)
 
-  console.log({ winnerId })
+  const seatInfo = seatNumbers.reduce((acc, i) => {
+    const userId = hand[`seat_${i}_id`];
+    const info = hand[`seat_${i}_info`];
+    const endStack = lastAction[`seat_${i}_stack`];
+    const mainPot = lastAction.main_pot;
+
+    if (userId && info && endStack) {
+      acc[`seat_${i}_info`] = {
+        ...info,
+        end_stack: userId === winnerId ? endStack + mainPot : endStack,
+      }
+    }
+
+    return acc;
+  }, {})
 
   await database('hands')
-    .where('id', handId)  
+    .where('id', hand.id)  
     .update('winners', winnerId)
     .update('is_completed', true)
-
-  const [table] = await database('tables')
-    .where('id', hand.table_id);
+    .update(seatInfo)
 
   pubsub.publish('tableUpdated', {
     tableUpdated: {
@@ -92,10 +72,25 @@ module.exports = async (handId, pubsub) => {
     },
   });
 
-  // TO UPDATE:
-  // winners
-  // is_completed
-  // main_pot
-  // side_pots
-  // went_to_showdown
+  setTimeout(async () => {
+    const players = await database('table_buyins')
+      .where('table_id', table.id)
+      .where('cash_out', null)
+
+    const seatedPlayers = players.map(p => ({
+      seat: p.seat,
+      stackAmount: p.buy_in,
+      userId: p.user_id,
+      isViewer: p.user_id === user.id,
+    }));
+
+    initHand(table, seatedPlayers, pubsub, user);
+  }, 5000);
 }
+
+// TO UPDATE:
+// winners
+// is_completed
+// main_pot
+// side_pots
+// went_to_showdown

@@ -40,7 +40,9 @@ const dateOptions = {
 
 class TablePage extends React.Component {
   componentDidMount() {
-    this.lastElement.scrollIntoView();
+    if (this.lastElement) {
+      this.lastElement.scrollIntoView();
+    }
   }
 
   componentDidUpdate() {
@@ -67,7 +69,6 @@ class TablePage extends React.Component {
               {table.group.name}
             </Link>
           </Breadcrumb.Item>
-          <Breadcrumb.Item>Tables</Breadcrumb.Item>
           <Breadcrumb.Item>{table.name}</Breadcrumb.Item>
         </Breadcrumb>
 
@@ -80,7 +81,12 @@ class TablePage extends React.Component {
             </Container>
 
             <Container>
-              <Box px={2} mb={3} style={{ maxHeight: 'calc(16vh + 16px)', overflow: 'auto', boxShadow: '#eee 1px 1px 4px inset' }}>
+              <Box px={2} mb={3} style={{
+                overflow: 'auto',
+                height: 'calc(16vh + 16px)',
+                maxHeight: 'calc(16vh + 16px)',
+                boxShadow: '#eee 1px 1px 4px inset',
+              }}>
                 {table.messages.map((message, idx) => (
                   <Box
                     mb={1}

@@ -36,7 +36,7 @@ const postflopViewerActions = (user, currentHand, streetActions, isViewerTurn, s
   let viewerActions = null;
 
   const lastAction = streetActions[streetActions.length - 1];
-  if (lastAction.street === 'river' && lastAction.end_of_street) {
+  if (lastAction && lastAction.street === 'river' && lastAction.end_of_street) {
     return null;
   }
 

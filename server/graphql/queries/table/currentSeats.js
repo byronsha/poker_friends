@@ -2,25 +2,31 @@ const database = require('../../../database')
 
 const seatNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-module.exports = async (source, args, { user, pokerTables }) => {
+module.exports = async (source, args, { user }) => {
   const [currentHand] = await database('hands')
     .where('table_id', source.id)
     .orderBy('created_at', 'DESC')
     .limit(1);
 
+  const playerBuyins = await database('table_buyins')
+    .where('table_id', source.id)
+    .where('cash_out', null)
+
   if (!currentHand) {
-    // This is the case where there are either no players or only
-    // 1 player sitting at the table. We should allow players to
-    // view or join the table here.
-    const players = pokerTables.players(source.id);
-    const seatedPlayers = players.map(p => ({ ...p, isViewer: p.userId === user.id }));
+    const seatedPlayers = playerBuyins.map(p => ({
+      seat: p.seat,
+      stackAmount: p.buy_in,
+      userId: p.user_id,
+      isViewer: p.user_id === user.id,
+    }));
     return seatedPlayers;
   }
 
   if (currentHand.is_completed) {
     return seatNumbers.map(i => {
       const userId = currentHand[`seat_${i}_id`];
-      if (userId) {
+      const buyin = playerBuyins.find(b => b.user_id === userId);
+      if (userId && buyin) {
         return {
           userId,
           seat: i,

@@ -13,7 +13,7 @@ function calcAmountAddedToBet({ action, amount, user, hand }) {
 function calcNextTurnMinRaise({ action, amount, hand }) {
   if (action === 'raise') {
     const amountRaised = amount - hand.big_blind_amount;
-    nextTurnMinRaise = amount + amountRaised;
+    return amount + amountRaised;
   }
 
   return hand.big_blind_amount * 2;

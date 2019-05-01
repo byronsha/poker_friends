@@ -12,7 +12,6 @@ const { schema, typeDefs } = require('./graphql/schema')
 const resolvers = require('./graphql/resolvers')
 const database = require('./database')
 const { PostgresPubSub } = require('graphql-postgres-subscriptions')
-const PokerTables = require('./poker/PokerTables')
 
 const PORT = process.env.PORT || 3001
 const HOST = process.env.HOST || 'localhost'
@@ -35,8 +34,6 @@ const auth = jwt({
 })
 app.use(auth)
 
-const pokerTables = new PokerTables()
-
 const apolloServer = new ApolloServer({
   typeDefs,
   resolvers,
@@ -48,7 +45,11 @@ const apolloServer = new ApolloServer({
       email: req.user.email,
     });
 
-    return { user, pubsub, pokerTables };
+    return { user, pubsub };
+  },
+  formatError: error => {
+    console.log(error);
+    // return new Error('Internal server error');
   },
 });
 apolloServer.applyMiddleware({ app });
@@ -74,7 +75,7 @@ ws.listen(PORT, () => {
               throw new Error('Unauthorized access');            
             }
             
-            return { user, pubsub, pokerTables };
+            return { user, pubsub };
           })
         }
 

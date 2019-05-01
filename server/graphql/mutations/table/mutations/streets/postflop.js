@@ -27,6 +27,7 @@ function checkEndOfStreet(args) {
     user,
     userIds,
     actions,
+    allActions,
     currentStreet,
   } = args;
 
@@ -35,15 +36,16 @@ function checkEndOfStreet(args) {
   }
 
   const userIdToActionsHash = calcUserIdToActionsHash(args);
+  const userIdToAllStreetActionsHash = calcUserIdToActionsHash({ ...args, actions: allActions });
 
-  const notFoldedUserIds = Object.keys(userIdToActionsHash).filter(userId => {
-    const actions = userIdToActionsHash[userId];
+  const notFoldedUserIds = Object.keys(userIdToAllStreetActionsHash).filter(userId => {
+    const actions = userIdToAllStreetActionsHash[userId];
     return actions.length > 0 && actions[actions.length - 1].action !== 'fold';
   });
 
   const betAmounts = notFoldedUserIds.map(userId => {
     const actions = userIdToActionsHash[userId];
-    return actions[actions.length - 1].amount;
+    return actions.length > 0 ? actions[actions.length - 1].amount : 0;
   })
 
   if (notFoldedUserIds < 2) {
@@ -53,7 +55,7 @@ function checkEndOfStreet(args) {
 
   const filterByLastAction = action => userId => {
     const actions = userIdToActionsHash[userId];
-    return actions[actions.length - 1].action === action;
+    return actions.length && actions[actions.length - 1].action === action;
   }
 
   const checkers = notFoldedUserIds.filter(filterByLastAction('check'))
@@ -70,7 +72,7 @@ function checkEndOfStreet(args) {
     return { isEndOfStreet: true, isEndOfHand: currentStreet === 'river' };        
   }
 
-  return { isEndOfStreet: false, isEndOfHand: currentStreet === 'river' };
+  return { isEndOfStreet: false, isEndOfHand: false };
 }
 
 module.exports = function calcPostflop(args) {

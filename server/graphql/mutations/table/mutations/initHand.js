@@ -1,5 +1,6 @@
 const { keyBy, camelCase, range } = require('lodash')
 const database = require('../../../../database')
+const Deck = require('../../../../poker/Deck');
 
 const seatNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
@@ -13,15 +14,36 @@ function camelizeKeys(object) {
   return newObject;
 }
 
-module.exports = async function initHand(table, pokerTables, pubsub, user) {
-  const players = pokerTables.players(table.id);
+function orderPlayersByTurn(players, lastHand) {
+  let orderedPlayers = players.slice().sort((a, b) => a.seat - b.seat);
+
+  if (lastHand && !lastHand.end_of_session) {
+    const orderedSeats = players.map(p => p.seat).sort();
+    const lastButtonSeat = seatNumbers.find(i => lastHand[`seat_${i}_id`] === lastHand.button_id);
+
+    const rotateIdx = orderedSeats.indexOf(lastButtonSeat) + 1;
+    // players[0] will always be the button after rotating
+    return [...orderedPlayers.slice(rotateIdx), ...orderedPlayers.slice(0, rotateIdx)]
+  }
+
+  return orderedPlayers;
+}
+
+module.exports = async function initHand(table, players, pubsub, user) {
+  const [lastHand] = await database('hands')
+    .where('table_id', table.id)
+    .orderBy('created_at', 'DESC')
+    .limit(1);
+
+  const orderedPlayers = orderPlayersByTurn();
+
   const playerHash = keyBy(players, 'seat');
   const isHeadsUp = players.length === 2;
-  const buttonPlayer = players[0];
-  const smallBlindPlayer = isHeadsUp ? players[0] : players[1];
-  const bigBlindPlayer = isHeadsUp ? players[1] : players[2];
+  const buttonPlayer = orderedPlayers[0];
+  const smallBlindPlayer = isHeadsUp ? orderedPlayers[0] : orderedPlayers[1];
+  const bigBlindPlayer = isHeadsUp ? orderedPlayers[1] : orderedPlayers[2];
   let playerToAct;
-
+  
   if (isHeadsUp) {
     playerToAct = buttonPlayer;
   } else if (players.length > 2) {
@@ -30,7 +52,7 @@ module.exports = async function initHand(table, pokerTables, pubsub, user) {
     throw new Error('Could not set playerToAct')
   }
 
-  const deck = pokerTables.newDeck();
+  const deck = new Deck();
 
   const seats = seatNumbers.reduce((acc, i) => {
     const player = players.find(p => p.seat === i)
@@ -39,9 +61,15 @@ module.exports = async function initHand(table, pokerTables, pubsub, user) {
       const cards = [deck.draw(), deck.draw()]
       const hand = cards.map(c => `${c.rank}${c.suit}`)
 
+      let stackAmount = player.stackAmount;
+
+      if (lastHand && !lastHand.end_of_session) {
+        stackAmount = lastHand[`seat_${i}_info`].end_stack;
+      }
+
       const info = {
         hand,
-        start_stack: player.stackAmount,
+        start_stack: stackAmount,
         end_stack: null,
       }
 
@@ -56,12 +84,18 @@ module.exports = async function initHand(table, pokerTables, pubsub, user) {
     const player = players.find(p => p.seat === i)
 
     if (player) {
+      let stackAmount = player.stackAmount;
+
+      if (lastHand && !lastHand.end_of_session) {
+        stackAmount = lastHand[`seat_${i}_info`].end_stack;
+      }
+
       if (player.userId === smallBlindPlayer.userId) {
-        acc[`seat_${i}_stack`] = player.stackAmount - table.small_blind_amount;
+        acc[`seat_${i}_stack`] = stackAmount - table.small_blind_amount;
       } else if (player.userId === bigBlindPlayer.userId) {
-        acc[`seat_${i}_stack`] = player.stackAmount - table.big_blind_amount;
+        acc[`seat_${i}_stack`] = stackAmount - table.big_blind_amount;
       } else {
-        acc[`seat_${i}_stack`] = player.stackAmount;
+        acc[`seat_${i}_stack`] = stackAmount;
       }
     }
 
@@ -121,6 +155,7 @@ module.exports = async function initHand(table, pokerTables, pubsub, user) {
       street: 'deal',
       main_pot: table.big_blind_amount + table.small_blind_amount,
       next_turn_min_raise: table.big_blind_amount * 2,
+      end_of_street: true,
       ...stacks,
     })
 

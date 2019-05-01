@@ -77,6 +77,7 @@ module.exports = async (_, { handEntityId, action, amount }, { user, pubsub }) =
       hand,
       currentStreet,
       actions: streetActions,
+      allActions: actionRows.filter(r => r.street !== 'deal'),
       lastAction: lastStreetAction,
       lastCallOrRaise: lastStreetCallOrRaise,
     }));
@@ -119,8 +120,8 @@ module.exports = async (_, { handEntityId, action, amount }, { user, pubsub }) =
       tableEntityId: table.entity_id,
     },
   });
-  
+
   if (isEndOfHand) {
-    setTimeout(() => endHand(hand.id, pubsub), 2500);
+    setTimeout(() => endHand(hand, table, pubsub, user), 2500);
   }
 }

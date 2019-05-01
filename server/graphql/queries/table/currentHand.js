@@ -46,7 +46,7 @@ function completedHand(currentHand, lastAction, user) {
     statuses: {},
     board: currentHand.board,
     mainPotMinusBets: 0,
-    mainPot: lastAction.main_pot, // TODO: Swap this for currentHand.main_pot after updating 
+    mainPot: 0, // TODO: Swap this for currentHand.main_pot after updating 
     sidePots: [],
     viewerCards: viewerCards(currentHand, user),
     isViewerTurn: false,
