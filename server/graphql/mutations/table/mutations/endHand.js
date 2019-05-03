@@ -81,7 +81,7 @@ module.exports = async (hand, table, pubsub, user) => {
   const [newMessage] = await database('messages')
     .returning(['id'])
     .insert({
-      body: `${winner.username} wins $${lastAction.main_pot}${winningHandText ? ` -- ${winningHandText}` : ''}`,
+      body: `${winner.username} wins $${lastAction.main_pot}${winningHandText ? ` - ${winningHandText}` : ''}`,
       table_id: table.id,
       user_id: null,
     })

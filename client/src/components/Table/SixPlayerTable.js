@@ -1,41 +1,17 @@
 import React from 'react';
+import { css } from 'emotion';
 import styled from 'styled-components';
 import { Flex, Box } from 'rebass';
 import Seat from './Seat';
 import EmptySeat from './EmptySeat';
 import PokerCard from 'components/ui/PokerCard';
-
-const TableContainer = styled(Flex)`
-  height: 60vh;
-  position: relative;
-  flex-direction: column;
-  background-color: #fff;
-  padding: 16px;
-  border-radius: 2px;
-`
-
-const TopSeat = styled(Box)`
-  :first-child, :last-child {
-    margin-top: 50px;
-  }
-`
-const BottomSeat = styled(Box)`
-  :nth-child(2) {
-    margin-top: 50px;
-  }
-`
-
-const Table = styled(Box)`
-  width: 100%;
-  text-align: center;
-`
-
-const Board = styled(Flex)`
-  margin: 0 auto;
-  display: inline-flex;
-`
+import TableBackground from './TableBackground';
 
 class SixPlayerTable extends React.Component {
+  state = {
+    rotationOffset: 0,
+  }
+
   findSeat = number => {
     return this.props.table.currentSeats.find(seat => seat.number === number)
   }
@@ -70,23 +46,42 @@ class SixPlayerTable extends React.Component {
     )
   }
 
-  render() {
-    console.log('PROPS', this.props)
-    console.log('CURRENT HAND', this.props.table.currentHand)
+  rotate = i => () => {
+    let newOffset = this.state.rotationOffset + i;
+    if (newOffset === -1) newOffset = 5;
+    if (newOffset === 6) newOffset = 0;
 
+    this.setState({ rotationOffset: newOffset })
+  }
+
+  rotationOrder = () => {
+    const seats = [1, 2, 3, 4, 5, 6]
+    const idx = this.state.rotationOffset
+    const rotated = [...seats.slice(idx), ...seats.slice(0, idx)]
+
+    return [...rotated.slice(0, 3), ...rotated.slice(3)]
+  }
+
+  render() {
     const { currentHand } = this.props.table;
 
     const mainPotMinusBets = currentHand && currentHand.mainPotMinusBets;
     const mainPot = currentHand && currentHand.mainPot;
     const board = currentHand && currentHand.board;
+    const seats = this.rotationOrder()
 
     return (
       <TableContainer mb={4} justifyContent="space-between">
+        <Flex className={css`position: absolute; top: 0; right: 0;`}>
+          <span onClick={this.rotate(1)}>{`counter`}</span>|
+          <span onClick={this.rotate(-1)}>{`clockwise`}</span>
+        </Flex>
+
         <Flex justifyContent="space-between">
-          {[1, 2, 3].map(i => (
-            <TopSeat key={i} p={5}>
+          {seats.map(i => (
+            <SeatContainer key={i} p={5}>
               {this.renderSeat(i)}
-            </TopSeat>
+            </SeatContainer>
           ))}
         </Flex>
 
@@ -112,16 +107,104 @@ class SixPlayerTable extends React.Component {
           )}
         </Table>
 
-        <Flex justifyContent="space-between">
-          {[4, 5, 6].map(i => (
-            <BottomSeat key={i} p={5}>
-              {this.renderSeat(i)}
-            </BottomSeat>
-          ))}
-        </Flex>
+        <TableBackground />
       </TableContainer>
     )
   }
 }
 
 export default SixPlayerTable;
+
+const TableContainer = styled(Flex)`
+  height: 60vh;
+  position: relative;
+  flex-direction: column;
+  background-color: #fff;
+  padding: 16px;
+  border-radius: 2px;
+`
+
+const SeatContainer = styled(Box)`
+  position: absolute;
+  height: 190px;
+  width: 190px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+
+  .bet {
+    position: absolute;
+  }
+
+  :first-child {
+    left: 0;
+    top: 50px;
+
+    .bet {
+      left: 130px;
+      bottom: -24px;
+    }
+  }
+
+  :nth-child(2) {
+    top: 0;
+    left: calc(50% - 90px);
+    
+    .bet {
+      left: 130px;
+      bottom: -24px;
+    }
+  }
+
+  :nth-child(3) {
+    left: calc(100% - 190px);
+    top: 50px;
+
+    .bet {
+      right: 130px;
+      bottom: -24px;
+    }
+  }
+
+  :nth-child(4) {
+    left: calc(100% - 190px);    
+    top: calc(100% - 240px);
+
+    .bet {
+      right: 130px;
+      top: -24px;
+    }
+  }
+
+  :nth-child(5) {
+    left: calc(50% - 90px);
+    top: calc(100% - 190px);
+
+    .bet {
+      right: 130px;
+      top: -24px;
+    }
+  }
+
+  :nth-child(6) {
+    left: 0;
+    top: calc(100% - 240px);
+
+    .bet {
+      left: 130px;
+      top: -24px;
+    }
+  }
+`
+
+const Table = styled(Box)`
+  width: calc(100% - 32px);
+  text-align: center;
+  position: absolute;
+  top: 48%;
+`
+
+const Board = styled(Flex)`
+  margin: 0 auto;
+  display: inline-flex;
+`

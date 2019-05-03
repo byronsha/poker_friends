@@ -1,10 +1,14 @@
 import React from 'react';
+import styled from 'styled-components'
 import { Box, Text } from 'rebass';
 import { Modal, InputNumber } from 'antd';
 
 import SitAtTableMutation from '../mutations/SitAtTableMutation';
 
 const noop = () => {};
+
+const Container = styled(Box)`
+`
 
 class EmptySeat extends React.Component {
   constructor(props) {
@@ -40,10 +44,10 @@ class EmptySeat extends React.Component {
 
     return (
       <div>
-        <Box onClick={disabled ? noop : this.openModal}>
+        <Container onClick={disabled ? noop : this.openModal}>
           <Text>{number}</Text>
           <Text>Sit here {disabled ? '(disabled)' : ''}</Text>
-        </Box>
+        </Container>
 
         <Modal
           title="How much will you buy in for?"

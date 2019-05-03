@@ -28,36 +28,36 @@ const app = express()
 app.use(cors())
 
 // auth middleware
-const auth = jwt({
-  secret: process.env.JWT_SECRET,
-  credentialsRequired: false
-})
-app.use(auth)
+// const auth = jwt({
+//   secret: process.env.JWT_SECRET,
+//   credentialsRequired: false
+// })
+// app.use(auth)
 
-const apolloServer = new ApolloServer({
-  typeDefs,
-  resolvers,
-  context: async ({ req }) => {
-    if (!req.user) return;
+// const apolloServer = new ApolloServer({
+//   typeDefs,
+//   resolvers,
+//   context: async ({ req }) => {
+//     if (!req.user) return;
 
-    const [user] = await database('users').where({
-      id: req.user.id,
-      email: req.user.email,
-    });
+//     const [user] = await database('users').where({
+//       id: req.user.id,
+//       email: req.user.email,
+//     });
 
-    return { user, pubsub };
-  },
-  formatError: error => {
-    console.log(error);
-    // return new Error('Internal server error');
-  },
-});
-apolloServer.applyMiddleware({ app });
+//     return { user, pubsub };
+//   },
+//   formatError: error => {
+//     console.log(error);
+//     // return new Error('Internal server error');
+//   },
+// });
+// apolloServer.applyMiddleware({ app });
 
 const ws = createServer(app)
 
 ws.listen(PORT, () => {
-  console.log(`🚀 Server ready at http://${HOST}:${PORT}${apolloServer.graphqlPath}`)
+  console.log(`🚀 Server ready at http://${HOST}:${PORT}`)
   new SubscriptionServer(
     {
       execute,

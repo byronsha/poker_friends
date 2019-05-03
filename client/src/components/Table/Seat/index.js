@@ -14,12 +14,6 @@ const Chips = styled(Box)`
   border-radius: 2px;
 `;
 
-const Bet = styled(Box)`
-  position: absolute;
-  left: 120px;
-  bottom: -24px;
-`;
-
 class Seat extends React.Component {
   state = {
     modalOpen: false,
@@ -41,7 +35,6 @@ class Seat extends React.Component {
     const { currentHand: { viewerCards } } = this.props;
 
     if (this.props.seat.isViewer && viewerCards) {
-      console.log({ viewerCards })
       return (
         <Flex>
           {viewerCards.map((card, idx) => <PokerCard card={card} key={idx} />)}
@@ -62,10 +55,10 @@ class Seat extends React.Component {
     if (!bet) return null;
 
     return (
-      <Bet>
+      <Box className="bet">
         ${bet}
         <Chips bg="lightgray" />
-      </Bet>
+      </Box>
     )
   }
 
@@ -93,7 +86,7 @@ class Seat extends React.Component {
         />
 
         {isViewer && (
-          <Dropdown overlay={menu} trigger={['click']}>
+          <Dropdown overlay={menu} trigger={['click']} className={css`position: absolute;`}>
             <Icon type="down" />
           </Dropdown>
         )}

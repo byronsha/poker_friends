@@ -20,21 +20,7 @@ const playerSubscription = require('./subscriptions/player')
 const tableSubscription = require('./subscriptions/table')
 
 const resolvers = {
-  Query: {
-    pins: async () => {
-      const pins = await database('pins').select()
-      return pins
-    },
-  },
   Mutation: {
-    addPin: async (_, { title, link, image }, { pubsub }) => {
-      const [id] = await database("pins")
-        .returning("id")
-        .insert({ title, link, image });
-
-      pubsub.publish("pinAdded", { pinAdded: { title, link, image, id } });
-      return id;
-    },
     signup: async (_, { username, email, password }) => {
       const salt = bcrypt.genSaltSync(10);
       const passwordHash = await bcrypt.hash(password, salt);
@@ -69,11 +55,6 @@ const resolvers = {
         process.env.JWT_SECRET,
         { expiresIn: '1y' }
       )
-    },
-  },
-  Subscription: {
-    pinAdded: {
-      subscribe: (_, _args, { pubsub }) => pubsub.asyncIterator('pinAdded'),
     },
   },
 }

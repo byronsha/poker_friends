@@ -67,12 +67,6 @@ class LeftNav extends React.Component {
           <NavLink to="/">Home</NavLink>
         </Menu.Item>
         <Menu.Item key="3">
-          <NavLink to="/pins">Pins</NavLink>
-        </Menu.Item>
-        <Menu.Item key="4">
-          <NavLink to="/upload-pin">Create pin</NavLink>
-        </Menu.Item>
-        <Menu.Item key="5">
           <NavLink to="/groups">Groups</NavLink>
         </Menu.Item>
 
