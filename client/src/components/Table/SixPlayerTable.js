@@ -5,6 +5,7 @@ import { Flex, Box } from 'rebass';
 import Seat from './Seat';
 import EmptySeat from './EmptySeat';
 import PokerCard from 'components/ui/PokerCard';
+import Chips from 'components/ui/Chips';
 import TableBackground from './TableBackground';
 
 class SixPlayerTable extends React.Component {
@@ -87,7 +88,10 @@ class SixPlayerTable extends React.Component {
 
         <Table>
           {mainPotMinusBets > 0 && (
-            <div>Main pot: ${mainPotMinusBets}</div>
+            <div className={css`margin: 0 auto;`}>
+              <Chips bg="lightgray" />
+              Main pot: ${mainPotMinusBets}
+            </div>
           )}
   
           {Boolean(board && board.length) && (
@@ -141,7 +145,7 @@ const SeatContainer = styled(Box)`
     top: 50px;
 
     .bet {
-      left: 130px;
+      left: 150px;
       bottom: -24px;
     }
   }
@@ -151,7 +155,7 @@ const SeatContainer = styled(Box)`
     left: calc(50% - 90px);
     
     .bet {
-      left: 130px;
+      left: 150px;
       bottom: -24px;
     }
   }
@@ -161,7 +165,7 @@ const SeatContainer = styled(Box)`
     top: 50px;
 
     .bet {
-      right: 130px;
+      right: 150px;
       bottom: -24px;
     }
   }
@@ -171,7 +175,7 @@ const SeatContainer = styled(Box)`
     top: calc(100% - 240px);
 
     .bet {
-      right: 130px;
+      right: 150px;
       top: -24px;
     }
   }
@@ -181,7 +185,7 @@ const SeatContainer = styled(Box)`
     top: calc(100% - 190px);
 
     .bet {
-      right: 130px;
+      right: 150px;
       top: -24px;
     }
   }
@@ -191,7 +195,7 @@ const SeatContainer = styled(Box)`
     top: calc(100% - 240px);
 
     .bet {
-      left: 130px;
+      left: 150px;
       top: -24px;
     }
   }
@@ -201,7 +205,11 @@ const Table = styled(Box)`
   width: calc(100% - 32px);
   text-align: center;
   position: absolute;
-  top: 48%;
+  top: calc(50% - 55px);
+  height: 110px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 `
 
 const Board = styled(Flex)`

@@ -39,12 +39,14 @@ function calcCompletedBets() {
 }
 
 function completedHand(currentHand, lastAction, user) {
+  const board = currentHand.board.slice(0, BOARD_SIZE[lastAction.street]);
+
   return {
     entityId: currentHand.entity_id,
     stacks: calcCompletedStacks(currentHand),
     bets: calcCompletedBets(),
     statuses: {},
-    board: currentHand.board,
+    board,
     mainPotMinusBets: 0,
     mainPot: 0, // TODO: Swap this for currentHand.main_pot after updating 
     sidePots: [],

@@ -6,10 +6,11 @@ import theme from 'theme';
 const colors = theme.colors;
 
 const Nameplate = styled(Card)`
-  width: 120px;
+  width: 140px;
   text-align: right;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  ${p => (p.active ? `border: 1px solid ${colors.teal};` : '')}
+  transform: translateY(-8px);
+  border: 1px solid ${p => (p.active ? colors.teal : colors.lightergray)}
 `;
 
 const StackAmount = styled(Text)`

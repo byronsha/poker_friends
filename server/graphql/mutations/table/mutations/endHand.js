@@ -117,7 +117,7 @@ module.exports = async (hand, table, pubsub, user) => {
     }));
 
     initHand(table, seatedPlayers, pubsub, user);
-  }, 5000);
+  }, 3000);
 }
 
 // TO UPDATE:

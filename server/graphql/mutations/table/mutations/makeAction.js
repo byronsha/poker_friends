@@ -115,14 +115,14 @@ module.exports = async (_, { handEntityId, action, amount }, { user, pubsub }) =
       end_of_street: isEndOfStreet,
     })
 
+  if (isEndOfHand) {
+    endHand(hand, table, pubsub, user);
+  }
+  
   pubsub.publish('tableUpdated', {
     tableUpdated: {
       id: table.id,
       tableEntityId: table.entity_id,
     },
   });
-
-  if (isEndOfHand) {
-    setTimeout(() => endHand(hand, table, pubsub, user), 2500);
-  }
 }

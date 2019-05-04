@@ -1,18 +1,12 @@
 import React from 'react';
-import styled from 'styled-components';
 import { css } from 'emotion';
 import { Box, Flex } from 'rebass';
 import { Menu, Dropdown, Icon, Modal } from 'antd';
 import PokerCard from 'components/ui/PokerCard';
+import Chips from 'components/ui/Chips';
 import Nameplate from './Nameplate';
 
 import StandFromTableMutation from '../mutations/StandFromTableMutation';
-
-const Chips = styled(Box)`
-  height: 4px;
-  width: 16px;
-  border-radius: 2px;
-`;
 
 class Seat extends React.Component {
   state = {
@@ -36,14 +30,14 @@ class Seat extends React.Component {
 
     if (this.props.seat.isViewer && viewerCards) {
       return (
-        <Flex>
+        <Flex ml={1}>
           {viewerCards.map((card, idx) => <PokerCard card={card} key={idx} />)}
         </Flex>
       );
     }
 
     return (
-      <Flex>
+      <Flex ml={1}>
         {[1, 2].map(idx => <PokerCard key={idx} />)}
       </Flex>
     );

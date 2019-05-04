@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { css } from 'emotion';
-import { Card, Text } from 'rebass';
+import { Box, Card, Text } from 'rebass';
 
 const SUITS = {
   's': '♠',
@@ -17,6 +17,7 @@ const COLORS = {
 const cardCss = css`
   width: 48px;
   height: 64px;
+  text-align: left;
 
   :not(:first-child) {
     margin-left: 4px;
@@ -34,12 +35,23 @@ class PokerCard extends React.Component {
     const [rank, suit] = this.props.card.split('');
     
     return (
-      <Text
-        color={COLORS[suit]}
-        fontSize={24}
-      >
-        {rank === 'T' ? '10' : rank}{SUITS[suit]}
-      </Text>
+      <Box p={1}>
+        <Text
+          color={COLORS[suit]}
+          fontSize={24}
+          lineHeight="20px"
+        >
+          {rank === 'T' ? '10' : rank}
+        </Text>
+        <Text
+          color={COLORS[suit]}
+          fontSize={48}
+          lineHeight="36px"
+          ml={1}
+        >
+          {SUITS[suit]}
+        </Text>
+      </Box>
     )
   }
 
