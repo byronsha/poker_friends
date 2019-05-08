@@ -32,7 +32,7 @@ module.exports = async (source, args, { user }) => {
           seat: i,
           stackAmount: currentHand[`seat_${i}_info`].end_stack,
           isTurn: false,
-          isButton: currentHand.big_blind_id === userId,
+          isButton: currentHand.button_id === userId,
         }
       }
     }).filter(Boolean)
@@ -54,7 +54,7 @@ module.exports = async (source, args, { user }) => {
         seat: i,
         stackAmount: lastAction[`seat_${i}_stack`],
         isTurn: lastAction.next_user_id === userId,
-        isButton: currentHand.big_blind_id === userId, // only handles heads up case
+        isButton: currentHand.button_id === userId,
       }
     }
   })

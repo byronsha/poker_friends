@@ -30,10 +30,10 @@ module.exports = {
         .select()
         .from('messages')
         .where('table_id', source.id)
-        .orderBy('created_at')
+        .orderBy('created_at', 'DESC')
         .limit(50);
 
-      return messages;
+      return messages.reverse();
     },
     currentSeats,
     currentHand,

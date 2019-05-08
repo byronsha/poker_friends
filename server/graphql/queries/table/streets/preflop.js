@@ -31,6 +31,11 @@ const preflopStatuses = (userIds, currentHand, preflopActions) => {
 const preflopViewerActions = (user, currentHand, preflopActions, isViewerTurn, stacks) => {
   let viewerActions = null;
 
+  const notAllInPlayers = seatNumbers.map(i =>
+    preflopActions[0] && preflopActions[0][`seat_${i}_stack`]
+  ).filter(stack => stack !== null && stack > 0);
+  const canRaise = notAllInPlayers.length > 1;
+
   seatNumbers.forEach(i => {
     if (currentHand[`seat_${i}_id`] === user.id && isViewerTurn) {
       const raises = preflopActions.filter(a => a.action === 'raise');
@@ -51,12 +56,31 @@ const preflopViewerActions = (user, currentHand, preflopActions, isViewerTurn, s
         callAmount = raises[raises.length - 1].amount;
       }
 
+      let maxRaiseAmount = stacks[`seat${i}Stack`];
+      
+      if (user.id === currentHand.small_blind_id) {
+        maxRaiseAmount += currentHand.big_blind_amount / 2;
+      } else if (user.id === currentHand.big_blind_id) {
+        maxRaiseAmount += currentHand.big_blind_amount;
+      }
+
+      if (callAmount >= maxRaiseAmount) {
+        callAmount = maxRaiseAmount;
+        minRaiseAmount = null;
+        maxRaiseAmount = null;
+      }
+
+      if (!canRaise) {
+        minRaiseAmount = null;
+        maxRaiseAmount = null;
+      }
+
       viewerActions = {
         canFold: !canCheckBigBlind,
         canCheck: canCheckBigBlind || callAmount === 0,
-        callAmount,
+        callAmount: canCheckBigBlind ? 0 : callAmount,
         minRaiseAmount,
-        maxRaiseAmount: stacks[`seat${i}Stack`],
+        maxRaiseAmount,
       };
     }
   })

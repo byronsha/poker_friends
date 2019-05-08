@@ -26,7 +26,10 @@ class Seat extends React.Component {
   }
 
   renderHand() {
-    const { currentHand: { viewerCards } } = this.props;
+    const { currentHand } = this.props
+    if (!currentHand) return null;
+
+    const { viewerCards } = currentHand;
 
     if (this.props.seat.isViewer && viewerCards) {
       return (
@@ -44,7 +47,10 @@ class Seat extends React.Component {
   }
 
   renderBet() {
-    const { number, currentHand: { bets } } = this.props;
+    const { number, currentHand } = this.props;
+    if (!currentHand) return null;
+
+    const { bets } = currentHand;
     const bet = bets[`seat${number}Bet`];
     if (!bet) return null;
 

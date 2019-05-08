@@ -55,6 +55,7 @@ const Hand = `
     sidePots: [Int!]
     isViewerTurn: Boolean!
     viewerActions: ViewerActions
+    viewerSeat: Int
   }
 `
 

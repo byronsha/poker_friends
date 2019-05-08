@@ -66,7 +66,6 @@ function checkEndOfStreet(args) {
   }
 
   const raisers = notFoldedUserIds.filter(filterByLastAction('raise'));
-  const allInners = notFoldedUserIds.filter(filterByLastAction('allin'));
   const callers = notFoldedUserIds.filter(filterByLastAction('call'));
 
   if (

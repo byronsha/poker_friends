@@ -84,8 +84,6 @@ module.exports = async (_, { handEntityId, action, amount }, { user, pubsub }) =
     }));
   }
 
-  // todo: handle allin case
-
   const stacks = seatNumbers.reduce((acc, i) => {
     if (userIdToSeatHash[user.id] === i) {
       acc[`seat_${i}_stack`] = lastAction[`seat_${i}_stack`] - amountAddedToBet;
@@ -94,6 +92,16 @@ module.exports = async (_, { handEntityId, action, amount }, { user, pubsub }) =
     }
     return acc;
   }, {})
+
+  const notAllInPlayers = seatNumbers
+    .map(i => stacks[`seat_${i}_stack`])
+    .filter(stack => stack !== null && stack > 0);
+
+  const actionIsComplete = notAllInPlayers.length === 1;
+  if (actionIsComplete) {
+    isEndOfHand = true;
+    isEndOfStreet = true;
+  }
 
   const mainPot = lastAction.main_pot + amountAddedToBet;
 

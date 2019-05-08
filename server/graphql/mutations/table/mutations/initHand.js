@@ -89,6 +89,9 @@ module.exports = async function initHand(table, players, pubsub, user) {
 
       if (lastHand && !lastHand.end_of_session) {
         stackAmount = lastHand[`seat_${i}_info`].end_stack;
+        if (stackAmount === 0) {
+          throw new Error('Cannot start hand with player with 0 stack')
+        }
       }
 
       if (player.userId === smallBlindPlayer.userId) {

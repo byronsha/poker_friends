@@ -7,6 +7,15 @@ import MakeActionMutation from './MakeActionMutation';
 
 const Button = styled(AntButton)`
   flex: 1;
+`;
+const SmallButton = styled(Button)`
+  height: 32px;
+
+  :not(:last-child) {
+    margin-right: 8px;
+  }
+`;
+const BigButton = styled(Button)`
   font-weight: bold;
   height: 48px;
 
@@ -59,13 +68,53 @@ class ViewerActionButtons extends React.Component {
   }
 
   handleRaise = () => {
-    const maxRaiseAmount = this.props.currentHand.viewerActions.maxRaiseAmount;
-    const isAllIn = this.state.raiseAmount === maxRaiseAmount;
-
     this.props.makeAction({
-      action: isAllIn ? 'allin' : 'raise',
+      action: 'raise',
       amount: this.state.raiseAmount,
     });
+  }
+
+  renderPotSizes = (viewerActions, currentHand) => {
+    const { callAmount, minRaiseAmount, maxRaiseAmount } = viewerActions;
+    const { bets, mainPot, viewerSeat } = currentHand;
+
+    const viewerBet = bets[`seat${viewerSeat}Bet`];
+    const potSizedBet = callAmount + viewerBet + mainPot;
+
+    return (
+      <Flex>
+        <SmallButton
+          type="normal"
+          onClick={() => this.setState({ raiseAmount: minRaiseAmount })}
+        >
+          Min
+        </SmallButton>
+        <SmallButton
+          type="normal"
+          onClick={() => this.setState({ raiseAmount: Math.round(potSizedBet/4) })}
+        >
+          1/4 Pot
+        </SmallButton>
+        <SmallButton
+          type="normal"
+          onClick={() => this.setState({ raiseAmount: Math.round(potSizedBet/2) })}
+        >
+          1/2 Pot
+        </SmallButton>
+        <SmallButton
+          type="normal"
+          onClick={() => this.setState({ raiseAmount: potSizedBet })}
+        >
+          Pot (${potSizedBet})
+        </SmallButton>
+        <SmallButton
+          type="normal"
+          onClick={() => this.setState({ raiseAmount: maxRaiseAmount })}
+        >
+          All in
+        </SmallButton>
+      </Flex>
+    )
   }
 
   render() {
@@ -76,44 +125,46 @@ class ViewerActionButtons extends React.Component {
     if (!isViewerTurn || !viewerActions) return null;
     
     console.log('ACTIONS', viewerActions)
+    console.log('HAND', currentHand)
 
     const { canFold, canCheck, callAmount, minRaiseAmount, maxRaiseAmount } = viewerActions;
     const { raiseAmount } = this.state;
 
-    // TODO: Implement viewerBetAmount GraphQL field
-    // const potAfterCalling = currentHand.mainPot + callAmount
-    // const potSizedBet = viewerBetAmount + callAmount + potAfterCalling;
+    const canRaise = (minRaiseAmount != null && maxRaiseAmount != null);
 
     return (
       <React.Fragment>
-        <Flex>
+        {canRaise && this.renderPotSizes(viewerActions, currentHand)}
+        {canRaise && (
+          <RaiseSlider
+            min={minRaiseAmount}
+            max={maxRaiseAmount}
+            amount={raiseAmount}
+            onChange={this.handleRaiseChange}
+          />
+        )}
+        <Flex mt={3}>
           {canFold && (
-            <Button type="primary" onClick={this.handleFold}>
+            <BigButton type="primary" onClick={this.handleFold}>
               FOLD
-            </Button>
+            </BigButton>
           )}
           {canCheck && (
-            <Button type="primary" onClick={this.handleCheck}>
+            <BigButton type="primary" onClick={this.handleCheck}>
               CHECK
-            </Button>
+            </BigButton>
           )}
           {!canCheck && callAmount > 0 && (
-            <Button type="primary" onClick={this.handleCall}>
+            <BigButton type="primary" onClick={this.handleCall}>
               CALL ${callAmount}
-            </Button>
+            </BigButton>
           )}
           {raiseAmount && (
-            <Button type="primary" onClick={this.handleRaise}>
+            <BigButton type="primary" onClick={this.handleRaise}>
               RAISE ${raiseAmount
-            }</Button>
+            }</BigButton>
           )}
         </Flex>
-        <RaiseSlider
-          min={minRaiseAmount}
-          max={maxRaiseAmount}
-          amount={raiseAmount}
-          onChange={this.handleRaiseChange}
-        />
       </React.Fragment>
     ) 
   }

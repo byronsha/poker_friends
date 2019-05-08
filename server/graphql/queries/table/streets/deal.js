@@ -32,12 +32,18 @@ const dealViewerActions = (user, currentHand, isViewerTurn, stacks) => {
 
   seatNumbers.forEach(i => {
     if (currentHand[`seat_${i}_id`] === user.id && isViewerTurn) {
+      let maxRaiseAmount = stacks[`seat${i}Stack`]
+      
+      if (user.id === currentHand.small_blind_id) {
+        maxRaiseAmount += currentHand.big_blind_amount / 2;
+      }
+
       viewerActions = {
         canFold: true,
         canCheck: false,
         callAmount: currentHand.big_blind_amount,
         minRaiseAmount: currentHand.big_blind_amount * 2,
-        maxRaiseAmount: stacks[`seat${i}Stack`],
+        maxRaiseAmount,
       };
     }
   });

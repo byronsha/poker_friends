@@ -62,7 +62,7 @@ module.exports = async (hand, table, pubsub, user) => {
     const endStack = lastAction[`seat_${i}_stack`];
     const mainPot = lastAction.main_pot;
 
-    if (userId && info && endStack) {
+    if (userId && info && endStack !== null) {
       acc[`seat_${i}_info`] = {
         ...info,
         end_stack: userId === winnerId ? endStack + mainPot : endStack,
@@ -76,6 +76,7 @@ module.exports = async (hand, table, pubsub, user) => {
     .where('id', hand.id)  
     .update('winners', winnerId)
     .update('is_completed', true)
+    .update('main_pot', lastAction.main_pot)
     .update(seatInfo)
 
   const [newMessage] = await database('messages')

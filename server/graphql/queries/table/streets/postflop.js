@@ -40,6 +40,11 @@ const postflopViewerActions = (user, currentHand, streetActions, isViewerTurn, s
     return null;
   }
 
+  const notAllInPlayers = seatNumbers.map(i =>
+    streetActions[0] && streetActions[0][`seat_${i}_stack`]
+  ).filter(stack => stack !== null && stack > 0);
+  const canRaise = notAllInPlayers.length > 1;
+
   seatNumbers.forEach(i => {
     if (currentHand[`seat_${i}_id`] === user.id && isViewerTurn) {
       const raises = streetActions.filter(a => a.action === 'raise');
@@ -58,12 +63,25 @@ const postflopViewerActions = (user, currentHand, streetActions, isViewerTurn, s
         callAmount = raises[raises.length - 1].amount;
       }
 
+      let maxRaiseAmount = stacks[`seat${i}Stack`];
+
+      if (callAmount >= maxRaiseAmount) {
+        callAmount = maxRaiseAmount;
+        minRaiseAmount = null;
+        maxRaiseAmount = null;
+      }
+
+      if (!canRaise) {
+        minRaiseAmount = null;
+        maxRaiseAmount = null;
+      }
+
       viewerActions = {
         canFold: callAmount !== 0,
         canCheck: callAmount === 0,
         callAmount,
         minRaiseAmount,
-        maxRaiseAmount: stacks[`seat${i}Stack`],
+        maxRaiseAmount,
       };
     }
   })

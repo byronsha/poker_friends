@@ -39,7 +39,14 @@ function calcCompletedBets() {
 }
 
 function completedHand(currentHand, lastAction, user) {
-  const board = currentHand.board.slice(0, BOARD_SIZE[lastAction.street]);
+  const allInPlayers = seatNumbers
+    .map(i => lastAction[`seat_${i}_stack`])
+    .filter(stack => stack !== null && stack === 0);
+
+  let board = currentHand.board.slice();
+  if (!allInPlayers.length) {
+    board = board.slice(0, BOARD_SIZE[lastAction.street]);
+  }
 
   return {
     entityId: currentHand.entity_id,
@@ -87,7 +94,8 @@ module.exports = async (source, args, { user }) => {
   const board = currentHand.board.slice(0, BOARD_SIZE[currentStreet]);
   const stacks = calcStacks(lastAction);
   const userIds = seatNumbers.map(i => currentHand[`seat_${i}_id`]).filter(Boolean)
-  
+  const viewerSeat = seatNumbers.find(i => currentHand[`seat_${i}_id`] === user.id)
+
   let bets;
   let statuses;
   let viewerActions;
@@ -132,5 +140,6 @@ module.exports = async (source, args, { user }) => {
     viewerCards: viewerCards(currentHand, user),
     isViewerTurn,
     viewerActions,
+    viewerSeat,
   }
 }

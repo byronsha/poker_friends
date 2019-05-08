@@ -33,6 +33,7 @@ const seatsAndHandsFragment = `
     mainPot
     viewerCards
     isViewerTurn
+    viewerSeat
     viewerActions {
       canFold
       canCheck
